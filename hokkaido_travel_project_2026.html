@@ -395,14 +395,9 @@
                 <div id="docsWrapper">
                 <div class="card" style="margin-bottom: 10px;">
                     <button type="button" class="del-item-btn" onclick="this.closest('.card').remove()">✕</button>
-                    <div class="editable-target" style="font-size: 15.5px; font-weight: bold; color: var(--primary);">JR</div>
-                    <div class="editable-target" style="font-size: 13.5px; color: var(--sub-text); margin-top: 4px;">票券</div>
+                    <div class="editable-target" style="font-size: 15.5px; font-weight: bold; color: var(--primary);">4</div>
+                    <div class="editable-target" style="font-size: 13.5px; color: var(--sub-text); margin-top: 4px;">4</div>
                     
-                <div style="margin-top: 8px;">
-                    <a href="https://drive.google.com/file/d/1EFIhXQFV1SrvGoJEPfFlensBtMRatJWP/view?usp=drive_link" target="_blank" class="doc-link-btn">
-                        🔗 查看票券 / 圖檔連結
-                    </a>
-                </div>
                 </div></div>
                 <button type="button" class="inline-add-section-btn" onclick="addNewDocItem()">➕ 新增重要文件 / 票券</button>
             </div>
@@ -504,7 +499,7 @@
 
     (function() {
         const FIREBASE_DB_URL = "https://wanghomesapporotravel2026-default-rtdb.firebaseio.com/";
-        const FIREBASE_ROOM_ID = "wang-family-hokkaido-";
+        const FIREBASE_ROOM_ID = "wang-family-hokkaido";
         const STORAGE_KEY = 'saved_guide_html_' + location.pathname;
         let isEditing = false;
 
