@@ -1012,6 +1012,7 @@
         }
     }
 
+    // 生成最終手冊 HTML（還原為預設不展開，移除 open）
     function generateFinalHTML() {
         const guideTitle = (document.getElementById('guideTitle').value || '').trim() || '旅遊手冊';
         const guideSubtitle = (document.getElementById('guideSubtitle').value || '').trim();
@@ -1056,7 +1057,7 @@
             hotelsHtml = `<div class="card" style="margin-bottom:0;">未設定飯店資訊</div>`;
         }
 
-        // 行程 (內嵌刪除當天與動態按鈕結構)
+        // 行程 (天數 details 預設不加 open)
         let daysHtml = '';
         document.querySelectorAll('.day-block').forEach(db => {
             const dayTitle = (db.querySelector('.day-title-input').value || '').trim();
@@ -1091,7 +1092,7 @@
             });
 
             daysHtml += `
-            <details class="sub-menu-item" open>
+            <details class="sub-menu-item">
                 <button type="button" class="del-day-btn" onclick="this.closest('.sub-menu-item').remove()">✕ 刪除當天</button>
                 <summary class="sub-menu-title editable-target">${dayTitle || '當日行程'}</summary>
                 <div class="sub-menu-content">
@@ -1111,7 +1112,7 @@
             }
         });
 
-        // 優惠券
+        // 優惠券 (子項目 details 預設不加 open)
         let subCouponsHtml = '';
         document.querySelectorAll('#couponsContainer .coupon-block').forEach((cb, cIdx) => {
             const title = (cb.querySelector('.coupon-title-input').value || '').trim();
@@ -1121,7 +1122,7 @@
             if (title || url) {
                 const descHtml = desc ? desc.replace(/\n/g, '<br>') : '';
                 subCouponsHtml += `
-                <details class="sub-menu-item" open>
+                <details class="sub-menu-item">
                     <button type="button" class="del-day-btn" onclick="this.closest('.sub-menu-item').remove()">✕ 刪除優惠券</button>
                     <summary class="sub-menu-title editable-target">${title || `優惠券 ${cIdx + 1}`}</summary>
                     <div class="sub-menu-content">
@@ -1135,7 +1136,7 @@
         });
 
         const couponsHtml = `
-        <details class="menu-item" open>
+        <details class="menu-item">
             <summary class="menu-title">🎁 5. 專屬電子優惠券</summary>
             <div class="menu-content" id="couponsContainer">
                 <div id="couponsWrapper">${subCouponsHtml}</div>
@@ -1169,7 +1170,7 @@
         });
 
         const docsHtml = `
-        <details class="menu-item" open>
+        <details class="menu-item">
             <summary class="menu-title">📎 6. 電子票券與重要文件</summary>
             <div class="menu-content" id="docsContainer">
                 <div id="docsWrapper">${docItemsHtml}</div>
@@ -1198,6 +1199,7 @@
     .sync-badge { position: fixed; top: 12px; left: 12px; z-index: 10000; font-size: 11px; padding: 4px 8px; border-radius: 12px; background: rgba(0,0,0,0.7); color: #fff; display: flex; align-items: center; gap: 4px; }
     .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #48bb78; }
 
+    /* 編輯模式動態按鈕 */
     .inline-add-spot-btn, .inline-add-section-btn { display: none; width: 100%; color: #fff; border: none; padding: 8px 12px; border-radius: 6px; font-size: 13.5px; font-weight: bold; margin-top: 10px; cursor: pointer; touch-action: manipulation; text-align: center; }
     .inline-add-spot-btn { background: #3182ce; }
     .inline-add-section-btn { background: #2b6cb0; }
@@ -1304,7 +1306,7 @@
             </div>
         </div>
         ${summaryHtml ? `<div class="summary-card"><div class="summary-title">🌟 本次行程核心摘要</div><ul class="summary-list editable-target">${summaryHtml}</ul></div>` : ''}
-        <details class="menu-item" open>
+        <details class="menu-item">
             <summary class="menu-title">✈️ 1. 班機時間</summary>
             <div class="menu-content">
                 <div class="card" style="margin-bottom: 0;">
@@ -1313,18 +1315,18 @@
                 </div>
             </div>
         </details>
-        <details class="menu-item" open>
+        <details class="menu-item">
             <summary class="menu-title">🏨 2. 飯店資訊</summary>
             <div class="menu-content">${hotelsHtml}</div>
         </details>
-        <details class="menu-item" open>
+        <details class="menu-item">
             <summary class="menu-title">🗓️ 3. 每日行程與交通</summary>
             <div class="menu-content" id="daysListContent">
                 <div id="daysWrapper">${daysHtml}</div>
                 <button type="button" class="inline-add-section-btn" onclick="addNewDayBlock()">➕ 新增天數 (Day)</button>
             </div>
         </details>
-        <details class="menu-item" open>
+        <details class="menu-item">
             <summary class="menu-title">🛍️ 4. 購物採買清單</summary>
             <div class="menu-content">
                 <div class="card" style="margin-bottom: 0;">
@@ -1366,7 +1368,6 @@
         const dayCount = wrapper.querySelectorAll('.sub-menu-item').length + 1;
         const newDay = document.createElement('details');
         newDay.className = 'sub-menu-item';
-        newDay.setAttribute('open', 'true');
         newDay.innerHTML = \`
             <button type="button" class="del-day-btn" onclick="this.closest('.sub-menu-item').remove()">✕ 刪除當天</button>
             <summary class="sub-menu-title editable-target" contenteditable="true">Day \${dayCount}｜新行程規劃</summary>
@@ -1405,7 +1406,6 @@
         const wrapper = document.getElementById('couponsWrapper');
         const newCoupon = document.createElement('details');
         newCoupon.className = 'sub-menu-item';
-        newCoupon.setAttribute('open', 'true');
         newCoupon.innerHTML = \`
             <button type="button" class="del-day-btn" onclick="this.closest('.sub-menu-item').remove()">✕ 刪除優惠券</button>
             <summary class="sub-menu-title editable-target" contenteditable="true">新店家優惠券名稱</summary>
@@ -1475,7 +1475,6 @@
                 fetch(endpoint)
                     .then(res => res.json())
                     .then(data => {
-                        // 防護檢查：若雲端存的是未包含新功能的舊版 HTML，不進行覆蓋，以本地最新版為準
                         if (data && data.html && data.html.includes('addNewDayBlock')) {
                             document.getElementById('guideMainContent').innerHTML = data.html;
                             text.textContent = '已同步最新雲端手冊';
