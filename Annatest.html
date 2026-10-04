@@ -525,7 +525,6 @@
         }
     }
 
-    // 核心採集：直接精確抓取當下表單內容
     function collectFormData() {
         const data = {
             firebaseDbUrl: (document.getElementById('firebaseDbUrl').value || '').trim(),
@@ -1013,7 +1012,7 @@
         }
     }
 
-    // 徹底解決不顯示問題：直接以現場 DOM 現抓現產出 HTML
+    // 生成最終手冊 HTML（包含直接插入卡片的新增函式，不跳彈窗）
     function generateFinalHTML() {
         const guideTitle = (document.getElementById('guideTitle').value || '').trim() || '旅遊手冊';
         const guideSubtitle = (document.getElementById('guideSubtitle').value || '').trim();
@@ -1058,7 +1057,7 @@
             hotelsHtml = `<div class="card" style="margin-bottom:0;">未設定飯店資訊</div>`;
         }
 
-        // 行程
+        // 行程 (外層附帶 daysWrapper 與新增天數按鈕)
         let daysHtml = '';
         document.querySelectorAll('.day-block').forEach(db => {
             const dayTitle = (db.querySelector('.day-title-input').value || '').trim();
@@ -1083,7 +1082,7 @@
                     ].filter(Boolean).join(' ');
 
                     spotsHtml += `
-                    <div class="item-box" style="position: relative;">
+                    <div class="item-box">
                         <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
                         ${headerDisplay ? `<div class="time-spot">${headerDisplay}</div>` : ''}
                         ${trans ? `<div class="trans-info"><b>交通路線: </b><span class="editable-target">${trans}</span>${routeUrl ? `<a class="route-btn" href="${routeUrl}" target="_blank">📍【google路線】</a>` : ''}</div>` : ''}
@@ -1093,7 +1092,8 @@
             });
 
             daysHtml += `
-            <details class="sub-menu-item">
+            <details class="sub-menu-item" open>
+                <button type="button" class="del-day-btn" onclick="this.closest('.sub-menu-item').remove()">✕ 刪除當天</button>
                 <summary class="sub-menu-title editable-target">${dayTitle || '當日行程'}</summary>
                 <div class="sub-menu-content">
                     <div class="spots-list-wrapper">${spotsHtml}</div>
@@ -1107,7 +1107,9 @@
         document.querySelectorAll('#shoppingContainer .row').forEach(sr => {
             const cat = (sr.querySelector('.shop-cat').value || '').trim();
             const desc = (sr.querySelector('.shop-desc').value || '').trim();
-            if (cat) shopHtml += `<tr><td><b class="editable-target">${cat}</b></td><td class="editable-target">${desc}</td></tr>`;
+            if (cat) {
+                shopHtml += `<tr><td><b class="editable-target">${cat}</b></td><td class="editable-target">${desc}</td><td style="text-align: center;"><button type="button" class="del-row-btn" onclick="this.closest('tr').remove()">✕</button></td></tr>`;
+            }
         });
 
         // 優惠券
@@ -1123,7 +1125,8 @@
                 if (title || url) {
                     const descHtml = desc ? desc.replace(/\n/g, '<br>') : '';
                     subCouponsHtml += `
-                    <details class="sub-menu-item">
+                    <details class="sub-menu-item" open>
+                        <button type="button" class="del-day-btn" onclick="this.closest('.sub-menu-item').remove()">✕ 刪除優惠券</button>
                         <summary class="sub-menu-title editable-target">${title || `優惠券 ${cIdx + 1}`}</summary>
                         <div class="sub-menu-content">
                             <div class="card" style="background-color: #fffaf0; border-color: #f6ad55; margin-bottom: 0;">
@@ -1137,16 +1140,27 @@
 
             if (subCouponsHtml) {
                 couponsHtml = `
-                <details class="menu-item">
+                <details class="menu-item" open>
                     <summary class="menu-title">🎁 5. 專屬電子優惠券</summary>
-                    <div class="menu-content">
-                        ${subCouponsHtml}
+                    <div class="menu-content" id="couponsContainer">
+                        <div id="couponsWrapper">${subCouponsHtml}</div>
+                        <button type="button" class="inline-add-section-btn" onclick="addNewCouponItem()">➕ 新增電子優惠券</button>
                     </div>
                 </details>`;
             }
         }
+        if (!couponsHtml) {
+            couponsHtml = `
+            <details class="menu-item" open>
+                <summary class="menu-title">🎁 5. 專屬電子優惠券</summary>
+                <div class="menu-content" id="couponsContainer">
+                    <div id="couponsWrapper"></div>
+                    <button type="button" class="inline-add-section-btn" onclick="addNewCouponItem()">➕ 新增電子優惠券</button>
+                </div>
+            </details>`;
+        }
 
-        // 第 6 項：直接走現場 DOM 取值，只要填入任何字即保證 100% 輸出
+        // 文件與票券
         let docsHtml = '';
         const docBlocks = document.querySelectorAll('#docsContainer .doc-block');
         let docItemsHtml = '';
@@ -1166,6 +1180,7 @@
 
                 docItemsHtml += `
                 <div class="card" style="margin-bottom: 10px;">
+                    <button type="button" class="del-item-btn" onclick="this.closest('.card').remove()">✕</button>
                     <div class="editable-target" style="font-size: 15.5px; font-weight: bold; color: var(--primary);">${title || '憑證文件'}</div>
                     ${note ? `<div class="editable-target" style="font-size: 13.5px; color: var(--sub-text); margin-top: 4px;">${note}</div>` : ''}
                     ${linkButton}
@@ -1173,13 +1188,14 @@
             }
         });
 
-        if (docItemsHtml) {
-            docsHtml = `
-            <details class="menu-item">
-                <summary class="menu-title">📎 6. 電子票券與重要文件</summary>
-                <div class="menu-content">${docItemsHtml}</div>
-            </details>`;
-        }
+        docsHtml = `
+        <details class="menu-item" open>
+            <summary class="menu-title">📎 6. 電子票券與重要文件</summary>
+            <div class="menu-content" id="docsContainer">
+                <div id="docsWrapper">${docItemsHtml}</div>
+                <button type="button" class="inline-add-section-btn" onclick="addNewDocItem()">➕ 新增重要文件 / 票券</button>
+            </div>
+        </details>`;
 
         return `<!DOCTYPE html>
 <html lang="zh-TW">
@@ -1197,15 +1213,25 @@
     .top-btn:active { transform: scale(0.96); }
     .top-btn-pdf { background: #2b6cb0; }
     body.is-editing #guideEditToggleBtn { background: #e53e3e; }
-    body.is-editing .editable-target { outline: 1.5px dashed var(--accent) !important; background-color: rgba(200, 109, 81, 0.08) !important; border-radius: 3px; }
+    body.is-editing .editable-target { outline: 1.5px dashed var(--accent) !important; background-color: rgba(200, 109, 81, 0.08) !important; border-radius: 3px; min-width: 20px; display: inline-block; }
 
     .sync-badge { position: fixed; top: 12px; left: 12px; z-index: 10000; font-size: 11px; padding: 4px 8px; border-radius: 12px; background: rgba(0,0,0,0.7); color: #fff; display: flex; align-items: center; gap: 4px; }
     .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #48bb78; }
 
-    .inline-add-spot-btn { display: none; width: 100%; background: #3182ce; color: #fff; border: none; padding: 8px; border-radius: 6px; font-size: 13.5px; font-weight: bold; margin-top: 8px; cursor: pointer; }
+    /* 編輯模式動態按鈕 */
+    .inline-add-spot-btn, .inline-add-section-btn { display: none; width: 100%; color: #fff; border: none; padding: 8px 12px; border-radius: 6px; font-size: 13.5px; font-weight: bold; margin-top: 10px; cursor: pointer; touch-action: manipulation; text-align: center; }
+    .inline-add-spot-btn { background: #3182ce; }
+    .inline-add-section-btn { background: #2b6cb0; }
+    
     .del-item-btn { display: none; position: absolute; top: 2px; right: 2px; background: #e53e3e; color: #fff; border: none; border-radius: 4px; padding: 2px 6px; font-size: 11px; font-weight: bold; cursor: pointer; z-index: 5; }
-    body.is-editing .inline-add-spot-btn { display: block; }
-    body.is-editing .del-item-btn { display: block; }
+    .del-day-btn { display: none; position: absolute; top: 10px; right: 38px; background: #e53e3e; color: #fff; border: none; border-radius: 4px; padding: 2px 8px; font-size: 11.5px; font-weight: bold; cursor: pointer; z-index: 5; }
+    .del-row-btn { display: none; background: #e53e3e; color: #fff; border: none; border-radius: 3px; padding: 2px 6px; font-size: 11px; cursor: pointer; }
+
+    body.is-editing .inline-add-spot-btn,
+    body.is-editing .inline-add-section-btn,
+    body.is-editing .del-item-btn,
+    body.is-editing .del-day-btn,
+    body.is-editing .del-row-btn { display: inline-block; }
 
     .tokyo-hero-banner { position: relative; background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 60%, #415a77 100%); color: #ffffff; padding: 24px 18px; border-radius: 12px; margin-bottom: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); overflow: hidden; }
     .tokyo-hero-banner::before { content: ""; position: absolute; top: -20px; right: -20px; width: 120px; height: 120px; background: radial-gradient(circle, rgba(230,57,70,0.85) 0%, rgba(230,57,70,0) 70%); border-radius: 50%; z-index: 1; }
@@ -1226,7 +1252,7 @@
     details[open] > summary.menu-title::after { transform: rotate(90deg); }
     .menu-content { padding: 12px; background-color: var(--bg); border-top: 1px solid #e2ded9; }
 
-    details.sub-menu-item { background-color: #ffffff; border: 1.5px solid var(--accent); border-radius: 8px; margin-bottom: 8px; overflow: hidden; }
+    details.sub-menu-item { position: relative; background-color: #ffffff; border: 1.5px solid var(--accent); border-radius: 8px; margin-bottom: 8px; overflow: hidden; }
     details.sub-menu-item:last-child { margin-bottom: 0; }
     summary.sub-menu-title { padding: 12px; font-size: 14.5px; font-weight: bold; color: var(--accent); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
     summary.sub-menu-title::-webkit-details-marker { display: none; }
@@ -1235,8 +1261,8 @@
     details[open] > summary.sub-menu-title::after { transform: rotate(90deg); }
     .sub-menu-content { padding: 10px; background-color: #ffffff; border-top: 1px solid #e2ded9; }
 
-    .card { background: var(--card-bg); border-radius: 8px; padding: 14px; margin-bottom: 12px; border: 1px solid #e2ded9; }
-    .item-box { border-bottom: 1px dotted #e0dcd5; padding-bottom: 10px; margin-bottom: 10px; }
+    .card { position: relative; background: var(--card-bg); border-radius: 8px; padding: 14px; margin-bottom: 12px; border: 1px solid #e2ded9; }
+    .item-box { border-bottom: 1px dotted #e0dcd5; padding-bottom: 10px; margin-bottom: 10px; position: relative; }
     .item-box:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
     .time-spot { font-size: 16px; font-weight: bold; color: var(--primary); margin-bottom: 4px; }
     .trans-info { background-color: #f0f4f8; padding: 8px 10px; border-radius: 6px; font-size: 14.5px; color: #2d3748; margin-bottom: 4px; }
@@ -1266,7 +1292,7 @@
 
     @media print {
         body { padding-top: 0 !important; background: #fff !important; }
-        .top-floating-bar, .sync-badge, .inline-add-spot-btn, .del-item-btn { display: none !important; }
+        .top-floating-bar, .sync-badge, .inline-add-spot-btn, .inline-add-section-btn, .del-item-btn, .del-day-btn, .del-row-btn { display: none !important; }
         details { display: block !important; border: 1.5px solid #cbd5e0 !important; margin-bottom: 14px !important; }
         summary.menu-title { display: block !important; background-color: #1a2a3a !important; color: #ffffff !important; padding: 8px 12px !important; font-size: 15px !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         summary.menu-title::after { display: none !important; }
@@ -1299,7 +1325,7 @@
             </div>
         </div>
         ${summaryHtml ? `<div class="summary-card"><div class="summary-title">🌟 本次行程核心摘要</div><ul class="summary-list editable-target">${summaryHtml}</ul></div>` : ''}
-        <details class="menu-item">
+        <details class="menu-item" open>
             <summary class="menu-title">✈️ 1. 班機時間</summary>
             <div class="menu-content">
                 <div class="card" style="margin-bottom: 0;">
@@ -1308,22 +1334,28 @@
                 </div>
             </div>
         </details>
-        <details class="menu-item">
+        <details class="menu-item" open>
             <summary class="menu-title">🏨 2. 飯店資訊</summary>
             <div class="menu-content">${hotelsHtml}</div>
         </details>
-        <details class="menu-item">
+        <details class="menu-item" open>
             <summary class="menu-title">🗓️ 3. 每日行程與交通</summary>
-            <div class="menu-content">${daysHtml}</div>
+            <div class="menu-content" id="daysListContent">
+                <div id="daysWrapper">${daysHtml}</div>
+                <button type="button" class="inline-add-section-btn" onclick="addNewDayBlock()">➕ 新增天數 (Day)</button>
+            </div>
         </details>
-        <details class="menu-item">
+        <details class="menu-item" open>
             <summary class="menu-title">🛍️ 4. 購物採買清單</summary>
             <div class="menu-content">
                 <div class="card" style="margin-bottom: 0;">
-                    <table class="simple-table">
-                        <tr><th>類別</th><th>建議地點與提醒</th></tr>
-                        ${shopHtml}
+                    <table class="simple-table" id="shoppingTable">
+                        <thead>
+                            <tr><th>類別</th><th>建議地點與提醒</th><th style="width: 40px; text-align: center;">操作</th></tr>
+                        </thead>
+                        <tbody>${shopHtml}</tbody>
                     </table>
+                    <button type="button" class="inline-add-section-btn" onclick="addNewShoppingRow()">➕ 新增購物項目</button>
                 </div>
             </div>
         </details>
@@ -1332,11 +1364,11 @@
     </div>
 
     <script>
+    // 1. 新增景點時段
     function addNewSpotToDay(btn) {
         const wrapper = btn.previousElementSibling;
         const newBox = document.createElement('div');
         newBox.className = 'item-box';
-        newBox.style.position = 'relative';
         newBox.innerHTML = \`
             <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
             <div class="time-spot">
@@ -1349,6 +1381,86 @@
             <div class="note-info editable-target" contenteditable="true">備註事項說明</div>
         \`;
         wrapper.appendChild(newBox);
+    }
+
+    // 2. 新增天數 (Day)
+    function addNewDayBlock() {
+        const wrapper = document.getElementById('daysWrapper');
+        const dayCount = wrapper.querySelectorAll('.sub-menu-item').length + 1;
+        const newDay = document.createElement('details');
+        newDay.className = 'sub-menu-item';
+        newDay.setAttribute('open', 'true');
+        newDay.innerHTML = \`
+            <button type="button" class="del-day-btn" onclick="this.closest('.sub-menu-item').remove()">✕ 刪除當天</button>
+            <summary class="sub-menu-title editable-target" contenteditable="true">Day \${dayCount}｜新行程規劃</summary>
+            <div class="sub-menu-content">
+                <div class="spots-list-wrapper">
+                    <div class="item-box">
+                        <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
+                        <div class="time-spot">
+                            <span class="editable-target" contenteditable="true">09:00</span> 
+                            <a class="map-link editable-target" contenteditable="true" href="https://www.google.com/maps" target="_blank">新景點名稱</a>
+                        </div>
+                        <div class="trans-info">
+                            <b>交通路線: </b><span class="editable-target" contenteditable="true">交通規劃</span>
+                        </div>
+                        <div class="note-info editable-target" contenteditable="true">注意事項</div>
+                    </div>
+                </div>
+                <button type="button" class="inline-add-spot-btn" onclick="addNewSpotToDay(this)">+ 新增景點時段</button>
+            </div>
+        \`;
+        wrapper.appendChild(newDay);
+    }
+
+    // 3. 新增購物項目
+    function addNewShoppingRow() {
+        const tbody = document.querySelector('#shoppingTable tbody');
+        const tr = document.createElement('tr');
+        tr.innerHTML = \`
+            <td><b class="editable-target" contenteditable="true">新採買項目</b></td>
+            <td class="editable-target" contenteditable="true">購買地點與提醒說明</td>
+            <td style="text-align: center;"><button type="button" class="del-row-btn" onclick="this.closest('tr').remove()">✕</button></td>
+        \`;
+        tbody.appendChild(tr);
+    }
+
+    // 4. 新增電子優惠券（免彈窗，直接插入卡片可編輯）
+    function addNewCouponItem() {
+        const wrapper = document.getElementById('couponsWrapper');
+        const newCoupon = document.createElement('details');
+        newCoupon.className = 'sub-menu-item';
+        newCoupon.setAttribute('open', 'true');
+        newCoupon.innerHTML = \`
+            <button type="button" class="del-day-btn" onclick="this.closest('.sub-menu-item').remove()">✕ 刪除優惠券</button>
+            <summary class="sub-menu-title editable-target" contenteditable="true">新店家優惠券名稱</summary>
+            <div class="sub-menu-content">
+                <div class="card" style="background-color: #fffaf0; border-color: #f6ad55; margin-bottom: 0;">
+                    <a class="coupon-btn editable-target" contenteditable="true" href="https://" target="_blank">👉 點此開啟電子優惠券</a>
+                    <div class="editable-target" contenteditable="true" style="font-size: 13.5px; color: var(--sub-text); margin-top: 10px;">請在此點擊輸入折扣說明</div>
+                </div>
+            </div>
+        \`;
+        wrapper.appendChild(newCoupon);
+    }
+
+    // 5. 新增重要文件 / 票券（免彈窗，直接插入卡片可編輯）
+    function addNewDocItem() {
+        const wrapper = document.getElementById('docsWrapper');
+        const newDoc = document.createElement('div');
+        newDoc.className = 'card';
+        newDoc.style.marginBottom = '10px';
+        newDoc.innerHTML = \`
+            <button type="button" class="del-item-btn" onclick="this.closest('.card').remove()">✕</button>
+            <div class="editable-target" contenteditable="true" style="font-size: 15.5px; font-weight: bold; color: var(--primary);">新文件 / 票券名稱</div>
+            <div class="editable-target" contenteditable="true" style="font-size: 13.5px; color: var(--sub-text); margin-top: 4px;">備註說明</div>
+            <div style="margin-top: 8px;">
+                <a href="https://" target="_blank" class="doc-link-btn editable-target" contenteditable="true">
+                    🔗 查看票券 / 圖檔連結
+                </a>
+            </div>
+        \`;
+        wrapper.appendChild(newDoc);
     }
 
     (function() {
@@ -1474,9 +1586,8 @@
 </html>`;
     }
 
-function previewGuide() {
+    function previewGuide() {
         let htmlContent = generateFinalHTML();
-        
         // 核心修復：防止預覽時觸發雲端初始化把畫面洗掉
         htmlContent = htmlContent.replace('initCloudSync();', '// initCloudSync();');
 
