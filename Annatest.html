@@ -104,7 +104,6 @@
     }
     .col { flex: 1; }
 
-    /* 動態天數與拖曳樣式 */
     .day-block {
         border: 1.8px solid #cbd5e0;
         background: #fbfbfa;
@@ -149,7 +148,6 @@
         align-items: center;
     }
 
-    /* 景點時段樣式 */
     .spot-block {
         background: #fff;
         border: 1px solid #cbd5e0;
@@ -210,17 +208,21 @@
         margin: 6px 0;
     }
 
-    /* 修正表單內圖片上傳預覽限制 */
-    .file-preview-thumbnail {
-        max-width: 220px;
-        max-height: 180px;
-        width: auto;
-        height: auto;
-        margin-top: 8px;
+    .doc-link-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background-color: #2b6cb0;
+        color: #ffffff !important;
+        font-weight: bold;
+        padding: 8px 14px;
         border-radius: 6px;
-        border: 1px solid #cbd5e0;
-        display: block;
-        object-fit: contain;
+        text-decoration: none;
+        margin-top: 8px;
+        font-size: 13.5px;
+    }
+    .doc-link-btn:hover {
+        background-color: #2c5282;
     }
 
     .btn {
@@ -325,7 +327,7 @@
             </div>
         </div>
 
-        <!-- 1. 航班資訊 (自動推算行程日期的來源) -->
+        <!-- 1. 航班資訊 -->
         <div class="form-section">
             <div class="section-title">✈️ 1. 航班時間資訊</div>
             <div class="row">
@@ -357,7 +359,7 @@
             <button type="button" class="btn btn-accent" id="btnAddHotel">+ 新增飯店</button>
         </div>
 
-        <!-- 3. 行程與交通 (支援整天拖曳與時段拖曳) -->
+        <!-- 3. 行程與交通 -->
         <div class="form-section">
             <div class="section-title">🗓️ 3. 每日行程與景點規劃</div>
             <div id="daysContainer"></div>
@@ -378,11 +380,11 @@
             <button type="button" class="btn btn-add" id="btnAddCoupon">+ 新增電子優惠券</button>
         </div>
 
-        <!-- 6. 電子票券與重要文件 -->
+        <!-- 6. 電子票券與重要文件 (純超連結) -->
         <div class="form-section">
-            <div class="section-title">📎 6. 電子票券與重要文件 (圖片 / PDF)</div>
+            <div class="section-title">📎 6. 電子票券與重要文件 (超連結)</div>
             <div style="font-size: 12.5px; color: #718096; margin-bottom: 8px;">
-                可上傳電子機票 PDF、交通票券截圖、Klook 憑證等（檔案自動內嵌於手冊中，離線可用）。
+                填寫車票 QR Code、登機憑證或 PDF 的線上網址，在手冊中以乾淨的超連結按鈕呈現，點擊直接另開。
             </div>
             <div id="docsContainer"></div>
             <button type="button" class="btn btn-add" id="btnAddDoc">+ 新增重要文件 / 票券</button>
@@ -412,7 +414,7 @@
         days: [{ title: "", spots: [{ time: "", spot: "", trans: "", routeUrl: "", note: "" }] }],
         shopping: [{ cat: "", desc: "" }],
         coupons: [],
-        docs: []
+        docs: [{ title: "", note: "", linkUrl: "" }]
     };
 
     function safeGetStorage(key) {
@@ -469,7 +471,11 @@
     function init() {
         const local = safeGetStorage('tokyo_guide_app_data');
         if (local) {
-            try { loadFormData(JSON.parse(local)); } catch (e) { loadFormData(blankData); }
+            try { 
+                loadFormData(JSON.parse(local)); 
+            } catch (e) { 
+                loadFormData(blankData); 
+            }
         } else {
             loadFormData(blankData);
         }
@@ -480,6 +486,7 @@
         document.getElementById('flightInTime').addEventListener('change', refreshAllDayTitles);
 
         document.getElementById('guideForm').addEventListener('input', autoSave);
+        document.getElementById('guideForm').addEventListener('change', autoSave);
 
         document.getElementById('btnExport').addEventListener('click', exportJSON);
         document.getElementById('btnImport').addEventListener('click', () => document.getElementById('importFile').click());
@@ -518,10 +525,11 @@
         }
     }
 
+    // 核心採集：直接精確抓取當下表單內容
     function collectFormData() {
         const data = {
-            firebaseDbUrl: document.getElementById('firebaseDbUrl').value.trim(),
-            firebaseRoomId: document.getElementById('firebaseRoomId').value.trim(),
+            firebaseDbUrl: (document.getElementById('firebaseDbUrl').value || '').trim(),
+            firebaseRoomId: (document.getElementById('firebaseRoomId').value || '').trim(),
             guideTitle: document.getElementById('guideTitle').value || '',
             guideSubtitle: document.getElementById('guideSubtitle').value || '',
             guideSummary: document.getElementById('guideSummary').value || '',
@@ -573,13 +581,12 @@
         });
 
         document.querySelectorAll('#docsContainer .doc-block').forEach(docEl => {
-            data.docs.push({
-                title: docEl.querySelector('.doc-title-input').value || '',
-                note: docEl.querySelector('.doc-note-input').value || '',
-                fileData: docEl.dataset.filedata || '',
-                fileType: docEl.dataset.filetype || '',
-                fileName: docEl.dataset.filename || ''
-            });
+            const title = (docEl.querySelector('.doc-title-input')?.value || '').trim();
+            const note = (docEl.querySelector('.doc-note-input')?.value || '').trim();
+            const linkUrl = (docEl.querySelector('.doc-url-input')?.value || '').trim();
+            if (title || note || linkUrl) {
+                data.docs.push({ title, note, linkUrl });
+            }
         });
 
         return data;
@@ -629,7 +636,16 @@
         const docsContainer = document.getElementById('docsContainer');
         docsContainer.innerHTML = '';
         if (data.docs && data.docs.length > 0) {
-            data.docs.forEach(doc => renderDocBlock(doc));
+            data.docs.forEach(doc => {
+                const targetUrl = doc.linkUrl || doc.imageUrl || doc.fileData || '';
+                renderDocBlock({
+                    title: doc.title || '',
+                    note: doc.note || '',
+                    linkUrl: targetUrl
+                });
+            });
+        } else {
+            renderDocBlock({ title: '', note: '', linkUrl: '' });
         }
 
         refreshAllDayTitles();
@@ -922,9 +938,8 @@
         const container = document.getElementById('docsContainer');
         const docDiv = document.createElement('div');
         docDiv.className = 'doc-block';
-        docDiv.dataset.filedata = docData.fileData || '';
-        docDiv.dataset.filetype = docData.fileType || '';
-        docDiv.dataset.filename = docData.fileName || '';
+
+        const safeUrl = docData.linkUrl || docData.imageUrl || docData.fileData || '';
 
         docDiv.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
@@ -933,53 +948,33 @@
             </div>
             <div class="form-group">
                 <label>文件名稱：</label>
-                <input type="text" class="doc-title-input" placeholder="例：東京來回電子機票 (PDF)" value="${docData.title || ''}">
+                <input type="text" class="doc-title-input" placeholder="例：JR 列車 QRCODE" value="${docData.title || ''}">
             </div>
             <div class="form-group">
                 <label>備註說明：</label>
-                <input type="text" class="doc-note-input" placeholder="例：訂單編號 #123456 / 乘車時出示" value="${docData.note || ''}">
+                <input type="text" class="doc-note-input" placeholder="例：回程交通：從札幌到新千歲機場坐 JR 列車" value="${docData.note || ''}">
             </div>
             <div class="form-group" style="margin-bottom:0;">
-                <label>選擇上傳檔案 (圖片或 PDF 檔)：</label>
-                <input type="file" class="doc-file-input" accept="image/*,application/pdf">
-                <div class="doc-preview-area" style="margin-top:6px;">
-                    ${renderDocPreviewHtml(docData.fileData, docData.fileType, docData.fileName)}
-                </div>
+                <label>圖檔 / 票券連結網址：</label>
+                <input type="text" class="doc-url-input" placeholder="例：https://example.com/ticket.jpg 或 Google Drive 連結" value="${safeUrl}">
             </div>
         `;
         container.appendChild(docDiv);
 
-        docDiv.querySelector('.btn-del-doc').addEventListener('click', () => { docDiv.remove(); autoSave(); });
-        docDiv.querySelector('.doc-file-input').addEventListener('change', function() {
-            const file = this.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const base64Data = e.target.result;
-                docDiv.dataset.filedata = base64Data;
-                docDiv.dataset.filetype = file.type;
-                docDiv.dataset.filename = file.name;
-                const titleInput = docDiv.querySelector('.doc-title-input');
-                if (!titleInput.value) titleInput.value = file.name.replace(/\.[^/.]+$/, "");
-                docDiv.querySelector('.doc-preview-area').innerHTML = renderDocPreviewHtml(base64Data, file.type, file.name);
-                autoSave();
-            };
-            reader.readAsDataURL(file);
+        docDiv.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', autoSave);
+            input.addEventListener('change', autoSave);
+        });
+
+        docDiv.querySelector('.btn-del-doc').addEventListener('click', () => { 
+            docDiv.remove(); 
+            autoSave(); 
         });
     }
 
     function addDoc() {
-        renderDocBlock({ title: '', note: '', fileData: '', fileType: '', fileName: '' });
+        renderDocBlock({ title: '', note: '', linkUrl: '' });
         autoSave();
-    }
-
-    function renderDocPreviewHtml(dataUrl, fileType, fileName) {
-        if (!dataUrl) return '<span style="font-size:12px; color:#a0aec0;">(尚未上傳檔案)</span>';
-        if (fileType && fileType.includes('pdf')) {
-            return `<div style="font-size:13px; color:#2b6cb0; font-weight:bold; margin-top:4px;">📄 已載入 PDF：${fileName || '電子檔'}</div>`;
-        } else {
-            return `<img src="${dataUrl}" class="file-preview-thumbnail" alt="預覽圖">`;
-        }
     }
 
     function exportJSON() {
@@ -1018,50 +1013,72 @@
         }
     }
 
-    // 生成最終手冊 HTML（修復圖片尺寸爆版問題）
+    // 徹底解決不顯示問題：直接以現場 DOM 現抓現產出 HTML
     function generateFinalHTML() {
-        const data = collectFormData();
-        const summaryHtml = data.guideSummary ? data.guideSummary.split('\n').filter(l => l.trim()).map(l => `<li>${l}</li>`).join('') : '';
+        const guideTitle = (document.getElementById('guideTitle').value || '').trim() || '旅遊手冊';
+        const guideSubtitle = (document.getElementById('guideSubtitle').value || '').trim();
+        const guideSummary = (document.getElementById('guideSummary').value || '').trim();
+        const flightInTime = (document.getElementById('flightInTime').value || '').trim();
+        const flightInAirport = (document.getElementById('flightInAirport').value || '').trim();
+        const flightOutTime = (document.getElementById('flightOutTime').value || '').trim();
+        const flightOutAirport = (document.getElementById('flightOutAirport').value || '').trim();
+        const safeDbUrl = JSON.stringify((document.getElementById('firebaseDbUrl').value || '').trim());
+        const safeRoomId = JSON.stringify((document.getElementById('firebaseRoomId').value || '').trim() || "default_trip");
 
+        const summaryHtml = guideSummary ? guideSummary.split('\n').filter(l => l.trim()).map(l => `<li>${l}</li>`).join('') : '';
+
+        // 飯店
         let hotelsHtml = '';
-        if (data.hotels && data.hotels.length > 0) {
-            data.hotels.forEach((h, idx) => {
-                if (h.name || h.address) {
-                    const dateInfo = (h.checkIn || h.checkOut) 
-                        ? `<div class="editable-target" style="font-size: 13.5px; color: var(--accent); font-weight: bold; margin-bottom: 4px;">📅 入住期間：${h.checkIn || '未指定'} 至 ${h.checkOut || '未指定'}</div>`
-                        : '';
-                    const mapTarget = h.address ? h.address.trim() : (h.name ? h.name.trim() : '');
-                    const searchUrl = mapTarget ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapTarget)}` : '#';
+        const hotelBlocks = document.querySelectorAll('#hotelsContainer .hotel-block');
+        hotelBlocks.forEach((hb, idx) => {
+            const checkIn = (hb.querySelector('.hotel-checkin').value || '').trim();
+            const checkOut = (hb.querySelector('.hotel-checkout').value || '').trim();
+            const name = (hb.querySelector('.hotel-name').value || '').trim();
+            const engName = (hb.querySelector('.hotel-engname').value || '').trim();
+            const address = (hb.querySelector('.hotel-address').value || '').trim();
+            const trans = (hb.querySelector('.hotel-trans').value || '').trim();
 
-                    hotelsHtml += `
-                    <div class="card" style="margin-bottom: ${idx === data.hotels.length - 1 ? '0' : '10px'};">
-                        ${dateInfo}
-                        <b>飯店名稱：</b><a class="map-link editable-target" href="${searchUrl}" target="_blank">${h.name || '未填寫'}</a> ${h.engName ? `<span class="editable-target">(${h.engName})</span>` : ''}<br>
-                        <b>地址：</b>${h.address ? `<a class="map-link editable-target" href="${searchUrl}" target="_blank">${h.address}</a>` : '未填寫'}<br>
-                        <b>交通引導：</b><span class="editable-target">${h.trans || '未填寫'}</span>
-                    </div>`;
-                }
-            });
-        }
+            if (name || address) {
+                const dateInfo = (checkIn || checkOut) 
+                    ? `<div class="editable-target" style="font-size: 13.5px; color: var(--accent); font-weight: bold; margin-bottom: 4px;">📅 入住期間：${checkIn || '未指定'} 至 ${checkOut || '未指定'}</div>`
+                    : '';
+                const mapTarget = address || name;
+                const searchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapTarget)}`;
+
+                hotelsHtml += `
+                <div class="card" style="margin-bottom: ${idx === hotelBlocks.length - 1 ? '0' : '10px'};">
+                    ${dateInfo}
+                    <b>飯店名稱：</b><a class="map-link editable-target" href="${searchUrl}" target="_blank">${name || '未填寫'}</a> ${engName ? `<span class="editable-target">(${engName})</span>` : ''}<br>
+                    <b>地址：</b>${address ? `<a class="map-link editable-target" href="${searchUrl}" target="_blank">${address}</a>` : '未填寫'}<br>
+                    <b>交通引導：</b><span class="editable-target">${trans || '未填寫'}</span>
+                </div>`;
+            }
+        });
         if (!hotelsHtml) {
             hotelsHtml = `<div class="card" style="margin-bottom:0;">未設定飯店資訊</div>`;
         }
 
+        // 行程
         let daysHtml = '';
-        data.days.forEach(day => {
+        document.querySelectorAll('.day-block').forEach(db => {
+            const dayTitle = (db.querySelector('.day-title-input').value || '').trim();
             let spotsHtml = '';
-            day.spots.forEach(spot => {
-                const timeText = spot.time ? spot.time.trim() : '';
-                const spotText = spot.spot ? spot.spot.trim() : '';
 
-                if (timeText || spotText || spot.trans) {
+            db.querySelectorAll('.spot-block').forEach(sb => {
+                const time = (sb.querySelector('.spot-time').value || '').trim();
+                const spot = (sb.querySelector('.spot-name').value || '').trim();
+                const trans = (sb.querySelector('.spot-trans').value || '').trim();
+                const routeUrl = (sb.querySelector('.spot-route-url').value || '').trim();
+                const note = (sb.querySelector('.spot-note').value || '').trim();
+
+                if (time || spot || trans) {
                     let spotDisplayHtml = '';
-                    if (spotText) {
-                        const searchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(spotText)}`;
-                        spotDisplayHtml = `<a class="map-link editable-target" href="${searchUrl}" target="_blank">${spotText}</a>`;
+                    if (spot) {
+                        const searchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(spot)}`;
+                        spotDisplayHtml = `<a class="map-link editable-target" href="${searchUrl}" target="_blank">${spot}</a>`;
                     }
                     const headerDisplay = [
-                        timeText ? `<span class="editable-target">${timeText}</span>` : '', 
+                        time ? `<span class="editable-target">${time}</span>` : '', 
                         spotDisplayHtml
                     ].filter(Boolean).join(' ');
 
@@ -1069,15 +1086,15 @@
                     <div class="item-box" style="position: relative;">
                         <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
                         ${headerDisplay ? `<div class="time-spot">${headerDisplay}</div>` : ''}
-                        ${spot.trans ? `<div class="trans-info"><b>交通路線: </b><span class="editable-target">${spot.trans}</span>${spot.routeUrl ? `<a class="route-btn" href="${spot.routeUrl}" target="_blank">📍【google路線】</a>` : ''}</div>` : ''}
-                        ${spot.note ? `<div class="note-info editable-target">${spot.note}</div>` : ''}
+                        ${trans ? `<div class="trans-info"><b>交通路線: </b><span class="editable-target">${trans}</span>${routeUrl ? `<a class="route-btn" href="${routeUrl}" target="_blank">📍【google路線】</a>` : ''}</div>` : ''}
+                        ${note ? `<div class="note-info editable-target">${note}</div>` : ''}
                     </div>`;
                 }
             });
 
             daysHtml += `
             <details class="sub-menu-item">
-                <summary class="sub-menu-title editable-target">${day.title || '當日行程'}</summary>
+                <summary class="sub-menu-title editable-target">${dayTitle || '當日行程'}</summary>
                 <div class="sub-menu-content">
                     <div class="spots-list-wrapper">${spotsHtml}</div>
                     <button type="button" class="inline-add-spot-btn" onclick="addNewSpotToDay(this)">+ 新增景點時段</button>
@@ -1085,23 +1102,32 @@
             </details>`;
         });
 
+        // 購物
         let shopHtml = '';
-        data.shopping.forEach(s => {
-            if (s.cat) shopHtml += `<tr><td><b class="editable-target">${s.cat}</b></td><td class="editable-target">${s.desc}</td></tr>`;
+        document.querySelectorAll('#shoppingContainer .row').forEach(sr => {
+            const cat = (sr.querySelector('.shop-cat').value || '').trim();
+            const desc = (sr.querySelector('.shop-desc').value || '').trim();
+            if (cat) shopHtml += `<tr><td><b class="editable-target">${cat}</b></td><td class="editable-target">${desc}</td></tr>`;
         });
 
+        // 優惠券
         let couponsHtml = '';
-        if (data.coupons && data.coupons.length > 0) {
+        const couponBlocks = document.querySelectorAll('#couponsContainer .coupon-block');
+        if (couponBlocks.length > 0) {
             let subCouponsHtml = '';
-            data.coupons.forEach((coupon, cIdx) => {
-                if (coupon.title || coupon.url) {
-                    const descHtml = coupon.desc ? coupon.desc.replace(/\n/g, '<br>') : '';
+            couponBlocks.forEach((cb, cIdx) => {
+                const title = (cb.querySelector('.coupon-title-input').value || '').trim();
+                const url = (cb.querySelector('.coupon-url-input').value || '').trim();
+                const desc = (cb.querySelector('.coupon-desc-input').value || '').trim();
+
+                if (title || url) {
+                    const descHtml = desc ? desc.replace(/\n/g, '<br>') : '';
                     subCouponsHtml += `
                     <details class="sub-menu-item">
-                        <summary class="sub-menu-title editable-target">${coupon.title || `優惠券 ${cIdx + 1}`}</summary>
+                        <summary class="sub-menu-title editable-target">${title || `優惠券 ${cIdx + 1}`}</summary>
                         <div class="sub-menu-content">
                             <div class="card" style="background-color: #fffaf0; border-color: #f6ad55; margin-bottom: 0;">
-                                ${coupon.url ? `<a class="coupon-btn" href="${coupon.url}" target="_blank">👉 點此開啟電子優惠券</a>` : ''}
+                                ${url ? `<a class="coupon-btn" href="${url}" target="_blank">👉 點此開啟電子優惠券</a>` : ''}
                                 ${descHtml ? `<div class="editable-target" style="font-size: 13.5px; color: var(--sub-text); margin-top: 10px;">${descHtml}</div>` : ''}
                             </div>
                         </div>
@@ -1120,51 +1146,47 @@
             }
         }
 
+        // 第 6 項：直接走現場 DOM 取值，只要填入任何字即保證 100% 輸出
         let docsHtml = '';
-        if (data.docs && data.docs.length > 0) {
-            let docItemsHtml = '';
-            data.docs.forEach(doc => {
-                if (doc.fileData || doc.title) {
-                    let previewContent = '';
-                    if (doc.fileType && doc.fileType.includes('pdf')) {
-                        previewContent = `
-                        <div style="margin-top:8px;">
-                            <a href="${doc.fileData}" download="${doc.fileName || 'document.pdf'}" class="btn" style="background-color:#2b6cb0; text-decoration:none; padding:6px 12px; font-size:13px; margin-bottom:8px; display:inline-block;">📄 下載 / 開啟 PDF 文件</a>
-                            <embed src="${doc.fileData}" type="application/pdf" width="100%" height="350px" style="border:1px solid #cbd5e0; border-radius:6px;" />
-                        </div>`;
-                    } else if (doc.fileData) {
-                        // 修正手冊中圖片置中與限制最大尺寸，防止爆版
-                        previewContent = `
-                        <div style="margin-top:8px; text-align:center;">
-                            <img src="${doc.fileData}" style="max-width:100%; max-height:300px; width:auto; height:auto; border-radius:6px; border:1px solid #cbd5e0; object-fit:contain; display:inline-block;" alt="票券憑證">
-                        </div>`;
-                    }
-                    docItemsHtml += `
-                    <div class="card" style="margin-bottom: 10px;">
-                        <div class="editable-target" style="font-size: 15.5px; font-weight: bold; color: var(--primary);">${doc.title || '憑證文件'}</div>
-                        ${doc.note ? `<div class="editable-target" style="font-size: 13.5px; color: var(--sub-text); margin-top: 4px;">${doc.note}</div>` : ''}
-                        ${previewContent}
-                    </div>`;
-                }
-            });
-            if (docItemsHtml) {
-                docsHtml = `
-                <details class="menu-item">
-                    <summary class="menu-title">📎 6. 電子票券與重要文件</summary>
-                    <div class="menu-content">${docItemsHtml}</div>
-                </details>`;
-            }
-        }
+        const docBlocks = document.querySelectorAll('#docsContainer .doc-block');
+        let docItemsHtml = '';
 
-        const safeDbUrl = JSON.stringify(data.firebaseDbUrl || "");
-        const safeRoomId = JSON.stringify(data.firebaseRoomId || "default_trip");
+        docBlocks.forEach(docEl => {
+            const title = (docEl.querySelector('.doc-title-input')?.value || '').trim();
+            const note = (docEl.querySelector('.doc-note-input')?.value || '').trim();
+            const linkUrl = (docEl.querySelector('.doc-url-input')?.value || '').trim();
+
+            if (title || note || linkUrl) {
+                const linkButton = linkUrl ? `
+                <div style="margin-top: 8px;">
+                    <a href="${linkUrl}" target="_blank" class="doc-link-btn">
+                        🔗 查看票券 / 圖檔連結
+                    </a>
+                </div>` : '';
+
+                docItemsHtml += `
+                <div class="card" style="margin-bottom: 10px;">
+                    <div class="editable-target" style="font-size: 15.5px; font-weight: bold; color: var(--primary);">${title || '憑證文件'}</div>
+                    ${note ? `<div class="editable-target" style="font-size: 13.5px; color: var(--sub-text); margin-top: 4px;">${note}</div>` : ''}
+                    ${linkButton}
+                </div>`;
+            }
+        });
+
+        if (docItemsHtml) {
+            docsHtml = `
+            <details class="menu-item">
+                <summary class="menu-title">📎 6. 電子票券與重要文件</summary>
+                <div class="menu-content">${docItemsHtml}</div>
+            </details>`;
+        }
 
         return `<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>${data.guideTitle || '旅遊手冊'}</title>
+<title>${guideTitle}</title>
 <style>
     :root { --primary: #1a2a3a; --accent: #c86d51; --highlight: #2b6cb0; --bg: #f7f6f3; --card-bg: #ffffff; --text: #2c2a29; --sub-text: #666059; }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -1222,6 +1244,22 @@
     a.map-link { color: var(--highlight); text-decoration: underline; font-weight: bold; }
     a.route-btn { display: inline-flex; align-items: center; gap: 3px; background-color: #e8f0fe; color: #1a73e8; border: 1px solid #aecbfa; padding: 2px 8px; border-radius: 12px; font-size: 12.5px; font-weight: bold; text-decoration: none; margin-left: 6px; }
     a.coupon-btn { display: inline-block; background-color: #e63946; color: #ffffff; font-weight: bold; padding: 8px 14px; border-radius: 6px; text-decoration: none; margin-top: 6px; font-size: 14px; }
+    
+    .doc-link-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background-color: #2b6cb0;
+        color: #ffffff !important;
+        font-weight: bold;
+        padding: 8px 14px;
+        border-radius: 6px;
+        text-decoration: none;
+        margin-top: 8px;
+        font-size: 13.5px;
+    }
+    .doc-link-btn:hover { background-color: #2c5282; }
+
     table.simple-table { width: 100%; border-collapse: collapse; font-size: 14px; }
     table.simple-table th { background: #edf2f7; color: #2d3748; text-align: left; padding: 6px 8px; }
     table.simple-table td { padding: 6px 8px; border-bottom: 1px solid #edf2f7; }
@@ -1256,8 +1294,8 @@
         <div class="tokyo-hero-banner">
             <div class="hero-content">
                 <span class="hero-badge">TRAVEL GUIDE</span>
-                <h1 class="hero-title editable-target">${data.guideTitle || '旅遊手冊'}</h1>
-                <p class="hero-subtitle editable-target">${data.guideSubtitle || ''}</p>
+                <h1 class="hero-title editable-target">${guideTitle}</h1>
+                <p class="hero-subtitle editable-target">${guideSubtitle}</p>
             </div>
         </div>
         ${summaryHtml ? `<div class="summary-card"><div class="summary-title">🌟 本次行程核心摘要</div><ul class="summary-list editable-target">${summaryHtml}</ul></div>` : ''}
@@ -1265,8 +1303,8 @@
             <summary class="menu-title">✈️ 1. 班機時間</summary>
             <div class="menu-content">
                 <div class="card" style="margin-bottom: 0;">
-                    <b>去程：</b><span class="editable-target">${data.flightInTime || '未填寫'}</span>（<span class="editable-target">${data.flightInAirport || '未填寫'}</span>）<br><br>
-                    <b>回程：</b><span class="editable-target">${data.flightOutTime || '未填寫'}</span>（<span class="editable-target">${data.flightOutAirport || '未填寫'}</span>）
+                    <b>去程：</b><span class="editable-target">${flightInTime || '未填寫'}</span>（<span class="editable-target">${flightInAirport || '未填寫'}</span>）<br><br>
+                    <b>回程：</b><span class="editable-target">${flightOutTime || '未填寫'}</span>（<span class="editable-target">${flightOutAirport || '未填寫'}</span>）
                 </div>
             </div>
         </details>
@@ -1436,8 +1474,12 @@
 </html>`;
     }
 
-    function previewGuide() {
-        const htmlContent = generateFinalHTML();
+function previewGuide() {
+        let htmlContent = generateFinalHTML();
+        
+        // 核心修復：防止預覽時觸發雲端初始化把畫面洗掉
+        htmlContent = htmlContent.replace('initCloudSync();', '// initCloudSync();');
+
         const frame = document.getElementById('preview-frame');
         frame.style.display = 'block';
         const doc = frame.contentDocument || frame.contentWindow.document;
