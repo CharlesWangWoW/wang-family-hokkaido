@@ -19,19 +19,28 @@
     .sync-badge { position: fixed; top: 12px; left: 12px; z-index: 10000; font-size: 11px; padding: 4px 8px; border-radius: 12px; background: rgba(0,0,0,0.7); color: #fff; display: flex; align-items: center; gap: 4px; }
     .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #48bb78; }
 
+    /* 編輯模式動態按鈕 */
     .inline-add-spot-btn, .inline-add-section-btn { display: none; width: 100%; color: #fff; border: none; padding: 8px 12px; border-radius: 6px; font-size: 13.5px; font-weight: bold; margin-top: 10px; cursor: pointer; touch-action: manipulation; text-align: center; }
     .inline-add-spot-btn { background: #3182ce; }
     .inline-add-section-btn { background: #2b6cb0; }
     
-    .del-item-btn { display: none; position: absolute; top: 2px; right: 2px; background: #e53e3e; color: #fff; border: none; border-radius: 4px; padding: 2px 6px; font-size: 11px; font-weight: bold; cursor: pointer; z-index: 5; }
+    .del-item-btn { display: none; background: #e53e3e; color: #fff; border: none; border-radius: 4px; padding: 2px 6px; font-size: 11px; font-weight: bold; cursor: pointer; }
     .del-day-btn { display: none; position: absolute; top: 10px; right: 38px; background: #e53e3e; color: #fff; border: none; border-radius: 4px; padding: 2px 8px; font-size: 11.5px; font-weight: bold; cursor: pointer; z-index: 5; }
     .del-row-btn { display: none; background: #e53e3e; color: #fff; border: none; border-radius: 3px; padding: 2px 6px; font-size: 11px; cursor: pointer; }
+    .btn-set-route { display: none; background: #38a169; color: #fff; border: none; border-radius: 12px; padding: 2px 8px; font-size: 11.5px; font-weight: bold; cursor: pointer; margin-left: 6px; }
+    .btn-edit-link { display: none; background: #4a5568; color: #fff; border: none; border-radius: 12px; padding: 2px 8px; font-size: 11.5px; font-weight: bold; cursor: pointer; margin-left: 6px; }
+
+    .spot-order-actions { display: none; position: absolute; top: 2px; right: 2px; gap: 4px; z-index: 5; }
+    .btn-order { background: #4a5568; color: #fff; border: none; border-radius: 4px; padding: 2px 6px; font-size: 11px; font-weight: bold; cursor: pointer; }
 
     body.is-editing .inline-add-spot-btn,
     body.is-editing .inline-add-section-btn,
     body.is-editing .del-item-btn,
     body.is-editing .del-day-btn,
-    body.is-editing .del-row-btn { display: inline-block; }
+    body.is-editing .del-row-btn,
+    body.is-editing .btn-set-route,
+    body.is-editing .btn-edit-link,
+    body.is-editing .spot-order-actions { display: inline-flex; }
 
     .tokyo-hero-banner { position: relative; background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 60%, #415a77 100%); color: #ffffff; padding: 24px 18px; border-radius: 12px; margin-bottom: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); overflow: hidden; }
     .tokyo-hero-banner::before { content: ""; position: absolute; top: -20px; right: -20px; width: 120px; height: 120px; background: radial-gradient(circle, rgba(230,57,70,0.85) 0%, rgba(230,57,70,0) 70%); border-radius: 50%; z-index: 1; }
@@ -92,7 +101,7 @@
 
     @media print {
         body { padding-top: 0 !important; background: #fff !important; }
-        .top-floating-bar, .sync-badge, .inline-add-spot-btn, .inline-add-section-btn, .del-item-btn, .del-day-btn, .del-row-btn { display: none !important; }
+        .top-floating-bar, .sync-badge, .inline-add-spot-btn, .inline-add-section-btn, .del-item-btn, .del-day-btn, .del-row-btn, .btn-set-route, .btn-edit-link, .spot-order-actions { display: none !important; }
         details { display: block !important; border: 1.5px solid #cbd5e0 !important; margin-bottom: 14px !important; }
         summary.menu-title { display: block !important; background-color: #1a2a3a !important; color: #ffffff !important; padding: 8px 12px !important; font-size: 15px !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         summary.menu-title::after { display: none !important; }
@@ -139,20 +148,20 @@
             <div class="menu-content">
                 <div class="card" style="margin-bottom: 10px;">
                     <div class="editable-target" style="font-size: 13.5px; color: var(--accent); font-weight: bold; margin-bottom: 4px;">📅 入住期間：2026-10-08 至 2026-10-10</div>
-                    <b>飯店名稱：</b><a class="map-link editable-target" href="https://www.google.com/maps/search/?api=1&query=%E6%9C%AD%E5%B9%8C%E5%B8%82%E6%9D%B1%E5%8C%BA%E5%8C%979%E6%9D%A1%E6%9D%B11%E4%B8%81%E7%9B%AE2%E7%95%AA7%E5%8F%B7" target="_blank">北海道大學附近民宿</a> <br>
-                    <b>地址：</b><a class="map-link editable-target" href="https://www.google.com/maps/search/?api=1&query=%E6%9C%AD%E5%B9%8C%E5%B8%82%E6%9D%B1%E5%8C%BA%E5%8C%979%E6%9D%A1%E6%9D%B11%E4%B8%81%E7%9B%AE2%E7%95%AA7%E5%8F%B7" target="_blank">札幌市東区北9条東1丁目2番7号</a><br>
+                    <b>飯店名稱：</b><a class="map-link editable-target spot-map-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9C%AD%E5%B9%8C%E5%B8%82%E6%9D%B1%E5%8C%BA%E5%8C%979%E6%9D%A1%E6%9D%B11%E4%B8%81%E7%9B%AE2%E7%95%AA7%E5%8F%B7" target="_blank">北海道大學附近民宿</a> <br>
+                    <b>地址：</b><a class="map-link editable-target spot-map-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9C%AD%E5%B9%8C%E5%B8%82%E6%9D%B1%E5%8C%BA%E5%8C%979%E6%9D%A1%E6%9D%B11%E4%B8%81%E7%9B%AE2%E7%95%AA7%E5%8F%B7" target="_blank">札幌市東区北9条東1丁目2番7号</a><br>
                     <b>交通引導：</b><span class="editable-target">札幌車站走路12分鐘</span>
                 </div>
                 <div class="card" style="margin-bottom: 10px;">
                     <div class="editable-target" style="font-size: 13.5px; color: var(--accent); font-weight: bold; margin-bottom: 4px;">📅 入住期間：2026-10-10 至 2026-10-11</div>
-                    <b>飯店名稱：</b><a class="map-link editable-target" href="https://www.google.com/maps/search/?api=1&query=%E5%8C%97%E6%B5%B7%E9%81%93%2C%20Jozankei%2C%20Minami-ku%20Jozankei%20Onsen%20Higashi%202-111%2C%20%E6%97%A5%E6%9C%AC" target="_blank">定山溪豪景酒店</a> <span class="editable-target">(定山渓ビューホテル)</span><br>
-                    <b>地址：</b><a class="map-link editable-target" href="https://www.google.com/maps/search/?api=1&query=%E5%8C%97%E6%B5%B7%E9%81%93%2C%20Jozankei%2C%20Minami-ku%20Jozankei%20Onsen%20Higashi%202-111%2C%20%E6%97%A5%E6%9C%AC" target="_blank">北海道, Jozankei, Minami-ku Jozankei Onsen Higashi 2-111, 日本</a><br>
+                    <b>飯店名稱：</b><a class="map-link editable-target spot-map-link" href="https://www.google.com/maps/search/?api=1&query=%E5%8C%97%E6%B5%B7%E9%81%93%2C%20Jozankei%2C%20Minami-ku%20Jozankei%20Onsen%20Higashi%202-111%2C%20%E6%97%A5%E6%9C%AC" target="_blank">定山溪豪景酒店</a> <span class="editable-target">(定山渓ビューホテル)</span><br>
+                    <b>地址：</b><a class="map-link editable-target spot-map-link" href="https://www.google.com/maps/search/?api=1&query=%E5%8C%97%E6%B5%B7%E9%81%93%2C%20Jozankei%2C%20Minami-ku%20Jozankei%20Onsen%20Higashi%202-111%2C%20%E6%97%A5%E6%9C%AC" target="_blank">北海道, Jozankei, Minami-ku Jozankei Onsen Higashi 2-111, 日本</a><br>
                     <b>交通引導：</b><span class="editable-target">未填寫</span>
                 </div>
                 <div class="card" style="margin-bottom: 0;">
                     <div class="editable-target" style="font-size: 13.5px; color: var(--accent); font-weight: bold; margin-bottom: 4px;">📅 入住期間：2026-10-11 至 2026-10-12</div>
-                    <b>飯店名稱：</b><a class="map-link editable-target" href="https://www.google.com/maps/search/?api=1&query=2-ch%C5%8Dme-2%20Minami%206%20J%C5%8Dhigashi%2C%20Chuo%20Ward%2C%20Sapporo%2C%20Hokkaido%20060-0056%E6%97%A5%E6%9C%AC" target="_blank">第四天住宿點</a> <span class="editable-target">(狸小路附近)</span><br>
-                    <b>地址：</b><a class="map-link editable-target" href="https://www.google.com/maps/search/?api=1&query=2-ch%C5%8Dme-2%20Minami%206%20J%C5%8Dhigashi%2C%20Chuo%20Ward%2C%20Sapporo%2C%20Hokkaido%20060-0056%E6%97%A5%E6%9C%AC" target="_blank">2-chōme-2 Minami 6 Jōhigashi, Chuo Ward, Sapporo, Hokkaido 060-0056日本</a><br>
+                    <b>飯店名稱：</b><a class="map-link editable-target spot-map-link" href="https://www.google.com/maps/search/?api=1&query=2-ch%C5%8Dme-2%20Minami%206%20J%C5%8Dhigashi%2C%20Chuo%20Ward%2C%20Sapporo%2C%20Hokkaido%20060-0056%E6%97%A5%E6%9C%AC" target="_blank">第四天住宿點</a> <span class="editable-target">(狸小路附近)</span><br>
+                    <b>地址：</b><a class="map-link editable-target spot-map-link" href="https://www.google.com/maps/search/?api=1&query=2-ch%C5%8Dme-2%20Minami%206%20J%C5%8Dhigashi%2C%20Chuo%20Ward%2C%20Sapporo%2C%20Hokkaido%20060-0056%E6%97%A5%E6%9C%AC" target="_blank">2-chōme-2 Minami 6 Jōhigashi, Chuo Ward, Sapporo, Hokkaido 060-0056日本</a><br>
                     <b>交通引導：</b><span class="editable-target">未填寫</span>
                 </div></div>
         </details>
@@ -166,39 +175,87 @@
                 <div class="sub-menu-content">
                     <div class="spots-list-wrapper">
                     <div class="item-box">
-                        <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
-                        <div class="time-spot"><span class="editable-target">6:00</span> <a class="map-link editable-target" href="https://www.google.com/maps/search/?api=1&query=%E5%8F%B0%E4%B8%AD%E5%B8%82%E5%8D%97%E5%8D%80" target="_blank">台中市南區</a></div>
-                        <div class="trans-info"><b>交通路線: </b><span class="editable-target">專車接送:建男與佳純從南區出發</span></div>
+                        <div class="spot-order-actions">
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, -1)">⬆</button>
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, 1)">⬇</button>
+                            <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
+                        </div>
+                        <div class="time-spot"><span class="editable-target">6:00</span> <a class="map-link editable-target spot-map-link" href="https://www.google.com/maps/search/?api=1&query=%E5%8F%B0%E4%B8%AD%E5%B8%82%E5%8D%97%E5%8D%80" target="_blank">台中市南區</a></div>
+                        <div class="trans-info">
+                            <b>交通路線: </b><span class="editable-target">專車接送:建男與佳純從南區出發</span> 
+                            <span class="route-link-wrapper"></span>
+                            <button type="button" class="btn-set-route" onclick="editRouteForSpot(this)">📍 設定 Google 路線</button>
+                        </div>
                         
                     </div>
                     <div class="item-box">
-                        <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
-                        <div class="time-spot"><span class="editable-target">6:30</span> <a class="map-link editable-target" href="https://www.google.com/maps/search/?api=1&query=%E5%BD%B0%E5%8C%96%E7%B8%A3%E5%A4%A7%E6%9D%91%E9%84%89" target="_blank">彰化縣大村鄉</a></div>
-                        <div class="trans-info"><b>交通路線: </b><span class="editable-target">專車接送:接爸媽從大村出發</span></div>
+                        <div class="spot-order-actions">
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, -1)">⬆</button>
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, 1)">⬇</button>
+                            <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
+                        </div>
+                        <div class="time-spot"><span class="editable-target">6:30</span> <a class="map-link editable-target spot-map-link" href="https://www.google.com/maps/search/?api=1&query=%E5%BD%B0%E5%8C%96%E7%B8%A3%E5%A4%A7%E6%9D%91%E9%84%89" target="_blank">彰化縣大村鄉</a></div>
+                        <div class="trans-info">
+                            <b>交通路線: </b><span class="editable-target">專車接送:接爸媽從大村出發</span> 
+                            <span class="route-link-wrapper"></span>
+                            <button type="button" class="btn-set-route" onclick="editRouteForSpot(this)">📍 設定 Google 路線</button>
+                        </div>
                         <div class="note-info editable-target">約7:20前到達機場 班機時間9:00</div>
                     </div>
                     <div class="item-box">
-                        <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
-                        <div class="time-spot"><span class="editable-target">14:55</span> <a class="map-link editable-target" href="https://www.google.com/maps/search/?api=1&query=%E7%88%B8%E5%AA%BD%E3%80%81%E5%BB%BA%E7%94%B7%E4%BD%B3%E7%B4%94%E6%8A%B5%E9%81%94%E6%96%B0%E5%8D%83%E6%AD%B2%E6%A9%9F%E5%A0%B4" target="_blank">爸媽、建男佳純抵達新千歲機場</a></div>
-                        <div class="trans-info"><b>交通路線: </b><span class="editable-target">完成旅行前置工作，包含交通 吃午晚餐</span></div>
+                        <div class="spot-order-actions">
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, -1)">⬆</button>
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, 1)">⬇</button>
+                            <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
+                        </div>
+                        <div class="time-spot"><span class="editable-target">14:55</span> <a class="map-link editable-target spot-map-link" href="https://www.google.com/maps/search/?api=1&query=%E7%88%B8%E5%AA%BD%E3%80%81%E5%BB%BA%E7%94%B7%E4%BD%B3%E7%B4%94%E6%8A%B5%E9%81%94%E6%96%B0%E5%8D%83%E6%AD%B2%E6%A9%9F%E5%A0%B4" target="_blank">爸媽、建男佳純抵達新千歲機場</a></div>
+                        <div class="trans-info">
+                            <b>交通路線: </b><span class="editable-target">完成旅行前置工作，包含交通 吃午晚餐</span> 
+                            <span class="route-link-wrapper"></span>
+                            <button type="button" class="btn-set-route" onclick="editRouteForSpot(this)">📍 設定 Google 路線</button>
+                        </div>
                         <div class="note-info editable-target">多數餐廳在機場3F  小樽魚板專賣店「KAMAEI」在2F</div>
                     </div>
                     <div class="item-box">
-                        <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
-                        <div class="time-spot"><span class="editable-target">15:10</span> <a class="map-link editable-target" href="https://www.google.com/maps/search/?api=1&query=%E8%82%B2%E7%90%B3%E6%8A%B5%E9%81%94%E6%96%B0%E5%8D%83%E6%AD%B2%E6%A9%9F%E5%A0%B4" target="_blank">育琳抵達新千歲機場</a></div>
-                        
+                        <div class="spot-order-actions">
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, -1)">⬆</button>
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, 1)">⬇</button>
+                            <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
+                        </div>
+                        <div class="time-spot"><span class="editable-target">15:10</span> <a class="map-link editable-target spot-map-link" href="https://www.google.com/maps/search/?api=1&query=%E8%82%B2%E7%90%B3%E6%8A%B5%E9%81%94%E6%96%B0%E5%8D%83%E6%AD%B2%E6%A9%9F%E5%A0%B4" target="_blank">育琳抵達新千歲機場</a></div>
+                        <div class="trans-info">
+                            <b>交通路線: </b><span class="editable-target">未設定路線</span> 
+                            <span class="route-link-wrapper"></span>
+                            <button type="button" class="btn-set-route" onclick="editRouteForSpot(this)">📍 設定 Google 路線</button>
+                        </div>
                         <div class="note-info editable-target">拿完行李後跟大家集合</div>
                     </div>
                     <div class="item-box">
-                        <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
-                        <div class="time-spot"><span class="editable-target">16:00</span> <a class="map-link editable-target" href="https://www.google.com/maps/search/?api=1&query=%E6%96%B0%E5%8D%83%E6%AD%B2%E6%A9%9F%E5%A0%B4%E9%9B%86%E5%90%88" target="_blank">新千歲機場集合</a></div>
-                        <div class="trans-info"><b>交通路線: </b><span class="editable-target">新千歲機場-札幌車站-民宿</span><a class="route-btn" href="https://www.google.com/maps/dir/%E6%96%B0%E5%8D%83%E6%AD%B2%E6%A9%9F%E5%A0%B4/%E6%9C%AD%E5%B9%8C%E8%BB%8A%E7%AB%99" target="_blank">📍【google路線】</a></div>
+                        <div class="spot-order-actions">
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, -1)">⬆</button>
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, 1)">⬇</button>
+                            <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
+                        </div>
+                        <div class="time-spot"><span class="editable-target">16:00</span> <a class="map-link editable-target spot-map-link" href="https://www.google.com/maps/search/?api=1&query=%E6%96%B0%E5%8D%83%E6%AD%B2%E6%A9%9F%E5%A0%B4%E9%9B%86%E5%90%88" target="_blank">新千歲機場集合</a></div>
+                        <div class="trans-info">
+                            <b>交通路線: </b><span class="editable-target">新千歲機場-札幌車站-民宿</span> 
+                            <span class="route-link-wrapper"><a class="route-btn" href="https://www.google.com/maps/dir/%E6%96%B0%E5%8D%83%E6%AD%B2%E6%A9%9F%E5%A0%B4/%E6%9C%AD%E5%B9%8C%E8%BB%8A%E7%AB%99" target="_blank">📍【google路線】</a></span>
+                            <button type="button" class="btn-set-route" onclick="editRouteForSpot(this)">📍 設定 Google 路線</button>
+                        </div>
                         <div class="note-info editable-target">交通方式:坐公車直達札幌車站?(需確認) 先到民宿放行李後再出來逛逛間吃晚餐</div>
                     </div>
                     <div class="item-box">
-                        <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
+                        <div class="spot-order-actions">
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, -1)">⬆</button>
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, 1)">⬇</button>
+                            <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
+                        </div>
                         <div class="time-spot"><span class="editable-target">深夜時間</span></div>
-                        
+                        <div class="trans-info">
+                            <b>交通路線: </b><span class="editable-target">未設定路線</span> 
+                            <span class="route-link-wrapper"></span>
+                            <button type="button" class="btn-set-route" onclick="editRouteForSpot(this)">📍 設定 Google 路線</button>
+                        </div>
                         <div class="note-info editable-target">到附近居酒屋吃消夜</div>
                     </div></div>
                     <button type="button" class="inline-add-spot-btn" onclick="addNewSpotToDay(this)">+ 新增景點時段</button>
@@ -210,39 +267,87 @@
                 <div class="sub-menu-content">
                     <div class="spots-list-wrapper">
                     <div class="item-box">
-                        <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
-                        <div class="time-spot"><span class="editable-target">8:00</span> <a class="map-link editable-target" href="https://www.google.com/maps/search/?api=1&query=%E3%81%8A%E3%81%AB%E3%81%8E%E3%82%8A%E5%B0%82%E9%96%80%E5%BA%97%20%E3%81%B2%E3%81%A8%E3%81%A4%E3%81%B6" target="_blank">おにぎり専門店 ひとつぶ</a></div>
-                        <div class="trans-info"><b>交通路線: </b><span class="editable-target">民宿-おにぎり専門店 ひとつぶ</span><a class="route-btn" href="https://www.google.com/maps/dir/%E6%9C%AD%E5%B9%8C%E5%B8%82%E6%9D%B1%E5%8C%BA%E5%8C%979%E6%9D%A1%E6%9D%B11%E4%B8%81%E7%9B%AE2%E7%95%AA7%E5%8F%B7/%E3%81%8A%E3%81%AB%E3%81%8E%E3%82%8A%E5%B0%82%E9%96%80%E5%BA%97%20%E3%81%B2%E3%81%A8%E3%81%A4%E3%81%B6" target="_blank">📍【google路線】</a></div>
+                        <div class="spot-order-actions">
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, -1)">⬆</button>
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, 1)">⬇</button>
+                            <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
+                        </div>
+                        <div class="time-spot"><span class="editable-target">8:00</span> <a class="map-link editable-target spot-map-link" href="https://www.google.com/maps/search/?api=1&query=%E3%81%8A%E3%81%AB%E3%81%8E%E3%82%8A%E5%B0%82%E9%96%80%E5%BA%97%20%E3%81%B2%E3%81%A8%E3%81%A4%E3%81%B6" target="_blank">おにぎり専門店 ひとつぶ</a></div>
+                        <div class="trans-info">
+                            <b>交通路線: </b><span class="editable-target">民宿-おにぎり専門店 ひとつぶ</span> 
+                            <span class="route-link-wrapper"><a class="route-btn" href="https://www.google.com/maps/dir/%E6%9C%AD%E5%B9%8C%E5%B8%82%E6%9D%B1%E5%8C%BA%E5%8C%979%E6%9D%A1%E6%9D%B11%E4%B8%81%E7%9B%AE2%E7%95%AA7%E5%8F%B7/%E3%81%8A%E3%81%AB%E3%81%8E%E3%82%8A%E5%B0%82%E9%96%80%E5%BA%97%20%E3%81%B2%E3%81%A8%E3%81%A4%E3%81%B6" target="_blank">📍【google路線】</a></span>
+                            <button type="button" class="btn-set-route" onclick="editRouteForSpot(this)">📍 設定 Google 路線</button>
+                        </div>
                         <div class="note-info editable-target">早餐吃飯糰 走路13分鐘</div>
                     </div>
                     <div class="item-box">
-                        <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
-                        <div class="time-spot"><span class="editable-target">9:00</span> <a class="map-link editable-target" href="https://www.google.com/maps/search/?api=1&query=%E5%8C%97%E6%B5%B7%E9%81%93%E7%A5%9E%E5%AE%AE" target="_blank">北海道神宮</a></div>
-                        <div class="trans-info"><b>交通路線: </b><span class="editable-target">交通坐計程車?</span><a class="route-btn" href="https://www.google.com/maps/dir/%E3%81%8A%E3%81%AB%E3%81%8E%E3%82%8A%E5%B0%82%E9%96%80%E5%BA%97%20%E3%81%B2%E3%81%A8%E3%81%A4%E3%81%B6/%E5%8C%97%E6%B5%B7%E9%81%93%E7%A5%9E%E5%AE%AE" target="_blank">📍【google路線】</a></div>
+                        <div class="spot-order-actions">
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, -1)">⬆</button>
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, 1)">⬇</button>
+                            <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
+                        </div>
+                        <div class="time-spot"><span class="editable-target">9:00</span> <a class="map-link editable-target spot-map-link" href="https://www.google.com/maps/search/?api=1&query=%E5%8C%97%E6%B5%B7%E9%81%93%E7%A5%9E%E5%AE%AE" target="_blank">北海道神宮</a></div>
+                        <div class="trans-info">
+                            <b>交通路線: </b><span class="editable-target">交通坐計程車?</span> 
+                            <span class="route-link-wrapper"><a class="route-btn" href="https://www.google.com/maps/dir/%E3%81%8A%E3%81%AB%E3%81%8E%E3%82%8A%E5%B0%82%E9%96%80%E5%BA%97%20%E3%81%B2%E3%81%A8%E3%81%A4%E3%81%B6/%E5%8C%97%E6%B5%B7%E9%81%93%E7%A5%9E%E5%AE%AE" target="_blank">📍【google路線】</a></span>
+                            <button type="button" class="btn-set-route" onclick="editRouteForSpot(this)">📍 設定 Google 路線</button>
+                        </div>
                         <div class="note-info editable-target">北海道神宮 必買神宮梅酒</div>
                     </div>
                     <div class="item-box">
-                        <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
-                        <div class="time-spot"><span class="editable-target">11:30</span> <a class="map-link editable-target" href="https://www.google.com/maps/search/?api=1&query=%E8%8A%B1%E3%81%A8%E3%81%84%E3%82%8D%E3%81%84%E3%82%8D%E7%A8%AE%E8%8A%B1%E5%BA%97" target="_blank">花といろいろ種花店</a></div>
-                        <div class="trans-info"><b>交通路線: </b><span class="editable-target">北海道神宮-育卉上班花店</span><a class="route-btn" href="https://www.google.com/maps/dir/%E5%8C%97%E6%B5%B7%E9%81%93%E7%A5%9E%E5%AE%AE/%E8%8A%B1%E3%81%A8%E3%81%84%E3%82%8D%E3%81%84%E3%82%8D%E7%A8%AE%E8%8A%B1%E5%BA%97" target="_blank">📍【google路線】</a></div>
+                        <div class="spot-order-actions">
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, -1)">⬆</button>
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, 1)">⬇</button>
+                            <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
+                        </div>
+                        <div class="time-spot"><span class="editable-target">11:30</span> <a class="map-link editable-target spot-map-link" href="https://www.google.com/maps/search/?api=1&query=%E8%8A%B1%E3%81%A8%E3%81%84%E3%82%8D%E3%81%84%E3%82%8D%E7%A8%AE%E8%8A%B1%E5%BA%97" target="_blank">花といろいろ種花店</a></div>
+                        <div class="trans-info">
+                            <b>交通路線: </b><span class="editable-target">北海道神宮-育卉上班花店</span> 
+                            <span class="route-link-wrapper"><a class="route-btn" href="https://www.google.com/maps/dir/%E5%8C%97%E6%B5%B7%E9%81%93%E7%A5%9E%E5%AE%AE/%E8%8A%B1%E3%81%A8%E3%81%84%E3%82%8D%E3%81%84%E3%82%8D%E7%A8%AE%E8%8A%B1%E5%BA%97" target="_blank">📍【google路線】</a></span>
+                            <button type="button" class="btn-set-route" onclick="editRouteForSpot(this)">📍 設定 Google 路線</button>
+                        </div>
                         <div class="note-info editable-target">記得攜帶給老闆娘的伴手禮</div>
                     </div>
                     <div class="item-box">
-                        <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
-                        <div class="time-spot"><span class="editable-target">12:30</span> <a class="map-link editable-target" href="https://www.google.com/maps/search/?api=1&query=%E6%9C%AD%E5%B9%8C%E9%B4%A8%E3%83%A9%E3%83%BC%E3%83%A1%E3%83%B3%20%E3%83%80%E3%83%83%E3%82%AF%E3%83%A9%E3%83%BC%E3%83%A1%E3%83%B3%20%E3%82%A8%E3%82%A4%E3%82%B8" target="_blank">札幌鴨ラーメン ダックラーメン エイジ</a></div>
-                        <div class="trans-info"><b>交通路線: </b><span class="editable-target">走路-花といろいろ種花店-札幌鴨ラーメン ダックラーメン エイジ</span><a class="route-btn" href="https://www.google.com/maps/dir/%E8%8A%B1%E3%81%A8%E3%81%84%E3%82%8D%E3%81%84%E3%82%8D%E7%A8%AE%E8%8A%B1%E5%BA%97/%E6%9C%AD%E5%B9%8C%E9%B4%A8%E3%83%A9%E3%83%BC%E3%83%A1%E3%83%B3%20%E3%83%80%E3%83%83%E3%82%AF%E3%83%A9%E3%83%BC%E3%83%A1%E3%83%B3%20%E3%82%A8%E3%82%A4%E3%82%B8" target="_blank">📍【google路線】</a></div>
+                        <div class="spot-order-actions">
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, -1)">⬆</button>
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, 1)">⬇</button>
+                            <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
+                        </div>
+                        <div class="time-spot"><span class="editable-target">12:30</span> <a class="map-link editable-target spot-map-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9C%AD%E5%B9%8C%E9%B4%A8%E3%83%A9%E3%83%BC%E3%83%A1%E3%83%B3%20%E3%83%80%E3%83%83%E3%82%AF%E3%83%A9%E3%83%BC%E3%83%A1%E3%83%B3%20%E3%82%A8%E3%82%A4%E3%82%B8" target="_blank">札幌鴨ラーメン ダックラーメン エイジ</a></div>
+                        <div class="trans-info">
+                            <b>交通路線: </b><span class="editable-target">走路-花といろいろ種花店-札幌鴨ラーメン ダックラーメン エイジ</span> 
+                            <span class="route-link-wrapper"><a class="route-btn" href="https://www.google.com/maps/dir/%E8%8A%B1%E3%81%A8%E3%81%84%E3%82%8D%E3%81%84%E3%82%8D%E7%A8%AE%E8%8A%B1%E5%BA%97/%E6%9C%AD%E5%B9%8C%E9%B4%A8%E3%83%A9%E3%83%BC%E3%83%A1%E3%83%B3%20%E3%83%80%E3%83%83%E3%82%AF%E3%83%A9%E3%83%BC%E3%83%A1%E3%83%B3%20%E3%82%A8%E3%82%A4%E3%82%B8" target="_blank">📍【google路線】</a></span>
+                            <button type="button" class="btn-set-route" onclick="editRouteForSpot(this)">📍 設定 Google 路線</button>
+                        </div>
                         <div class="note-info editable-target">中午吃鴨肉拉麵(札幌鴨ラーメン ダックラーメン エイジ) 走路15分鐘</div>
                     </div>
                     <div class="item-box">
-                        <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
-                        <div class="time-spot"><span class="editable-target">15:00</span> <a class="map-link editable-target" href="https://www.google.com/maps/search/?api=1&query=%E6%9C%AD%E5%B9%8C%E5%95%A4%E9%85%92%E5%8D%9A%E7%89%A9%E9%A4%A8" target="_blank">札幌啤酒博物館</a></div>
-                        <div class="trans-info"><b>交通路線: </b><span class="editable-target">鴨肉拉麵-札幌啤酒博物館</span><a class="route-btn" href="https://www.google.com/maps/dir/14%20Chome-1-23%20Minami%208%20Jonishi%2C%20Chuo%20Ward%2C%20Sapporo%2C%20Hokkaido%20064-0808%2C%20Japan/%E6%9C%AD%E5%B9%8C%E5%95%A4%E9%85%92%E5%8D%9A%E7%89%A9%E9%A4%A8" target="_blank">📍【google路線】</a></div>
+                        <div class="spot-order-actions">
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, -1)">⬆</button>
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, 1)">⬇</button>
+                            <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
+                        </div>
+                        <div class="time-spot"><span class="editable-target">15:00</span> <a class="map-link editable-target spot-map-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9C%AD%E5%B9%8C%E5%95%A4%E9%85%92%E5%8D%9A%E7%89%A9%E9%A4%A8" target="_blank">札幌啤酒博物館</a></div>
+                        <div class="trans-info">
+                            <b>交通路線: </b><span class="editable-target">鴨肉拉麵-札幌啤酒博物館</span> 
+                            <span class="route-link-wrapper"><a class="route-btn" href="https://www.google.com/maps/dir/14%20Chome-1-23%20Minami%208%20Jonishi%2C%20Chuo%20Ward%2C%20Sapporo%2C%20Hokkaido%20064-0808%2C%20Japan/%E6%9C%AD%E5%B9%8C%E5%95%A4%E9%85%92%E5%8D%9A%E7%89%A9%E9%A4%A8" target="_blank">📍【google路線】</a></span>
+                            <button type="button" class="btn-set-route" onclick="editRouteForSpot(this)">📍 設定 Google 路線</button>
+                        </div>
                         <div class="note-info editable-target">札幌啤酒博物館下午5點關門</div>
                     </div>
                     <div class="item-box">
-                        <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
-                        <div class="time-spot"><span class="editable-target">18:30</span> <a class="map-link editable-target" href="https://www.google.com/maps/search/?api=1&query=%E3%81%8B%E3%81%AB%E9%A3%9F%E3%81%B9%E6%94%BE%E9%A1%8C%20%E8%9F%B9%E5%BA%A7%20%E6%9C%AD%E5%B9%8C" target="_blank">かに食べ放題 蟹座 札幌</a></div>
-                        
+                        <div class="spot-order-actions">
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, -1)">⬆</button>
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, 1)">⬇</button>
+                            <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
+                        </div>
+                        <div class="time-spot"><span class="editable-target">18:30</span> <a class="map-link editable-target spot-map-link" href="https://www.google.com/maps/search/?api=1&query=%E3%81%8B%E3%81%AB%E9%A3%9F%E3%81%B9%E6%94%BE%E9%A1%8C%20%E8%9F%B9%E5%BA%A7%20%E6%9C%AD%E5%B9%8C" target="_blank">かに食べ放題 蟹座 札幌</a></div>
+                        <div class="trans-info">
+                            <b>交通路線: </b><span class="editable-target">未設定路線</span> 
+                            <span class="route-link-wrapper"><a class="route-btn" href="https://www.google.com/maps/dir/%E6%9C%AD%E5%B9%8C%E5%95%A4%E9%85%92%E5%8D%9A%E7%89%A9%E9%A4%A8/%E3%81%8B%E3%81%AB%E9%A3%9F%E3%81%B9%E6%94%BE%E9%A1%8C%20%E8%9F%B9%E5%BA%A7%20%E6%9C%AD%E5%B9%8C" target="_blank">📍【google路線】</a></span>
+                            <button type="button" class="btn-set-route" onclick="editRouteForSpot(this)">📍 設定 Google 路線</button>
+                        </div>
                         <div class="note-info editable-target">訂位18:30</div>
                     </div></div>
                     <button type="button" class="inline-add-spot-btn" onclick="addNewSpotToDay(this)">+ 新增景點時段</button>
@@ -254,21 +359,45 @@
                 <div class="sub-menu-content">
                     <div class="spots-list-wrapper">
                     <div class="item-box">
-                        <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
+                        <div class="spot-order-actions">
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, -1)">⬆</button>
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, 1)">⬇</button>
+                            <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
+                        </div>
                         <div class="time-spot"><span class="editable-target">9:00</span></div>
-                        
+                        <div class="trans-info">
+                            <b>交通路線: </b><span class="editable-target">未設定路線</span> 
+                            <span class="route-link-wrapper"></span>
+                            <button type="button" class="btn-set-route" onclick="editRouteForSpot(this)">📍 設定 Google 路線</button>
+                        </div>
                         <div class="note-info editable-target">9點出門，包車前往諏訪神社、南樽市場、小樽運河、天狗山纜車、豐平峽水壩</div>
                     </div>
                     <div class="item-box">
-                        <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
-                        <div class="time-spot"><span class="editable-target">12:00</span> <a class="map-link editable-target" href="https://www.google.com/maps/search/?api=1&query=%E5%8D%97%E6%A8%BD%E5%B8%82%E5%A0%B4" target="_blank">南樽市場</a></div>
-                        
+                        <div class="spot-order-actions">
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, -1)">⬆</button>
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, 1)">⬇</button>
+                            <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
+                        </div>
+                        <div class="time-spot"><span class="editable-target">12:00</span> <a class="map-link editable-target spot-map-link" href="https://www.google.com/maps/search/?api=1&query=%E5%8D%97%E6%A8%BD%E5%B8%82%E5%A0%B4" target="_blank">南樽市場</a></div>
+                        <div class="trans-info">
+                            <b>交通路線: </b><span class="editable-target">未設定路線</span> 
+                            <span class="route-link-wrapper"><a class="route-btn" href="https://www.google.com/maps/search/?api=1&query=%E5%8D%97%E6%A8%BD%E5%B8%82%E5%A0%B4" target="_blank">📍【google路線】</a></span>
+                            <button type="button" class="btn-set-route" onclick="editRouteForSpot(this)">📍 設定 Google 路線</button>
+                        </div>
                         <div class="note-info editable-target">當地市場、吃海鮮</div>
                     </div>
                     <div class="item-box">
-                        <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
-                        <div class="time-spot"><span class="editable-target">17:00</span> <a class="map-link editable-target" href="https://www.google.com/maps/search/?api=1&query=%E5%AE%9A%E5%B1%B1%E6%BA%AA%E8%B1%AA%E6%99%AF%E9%85%92%E5%BA%97" target="_blank">定山溪豪景酒店</a></div>
-                        
+                        <div class="spot-order-actions">
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, -1)">⬆</button>
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, 1)">⬇</button>
+                            <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
+                        </div>
+                        <div class="time-spot"><span class="editable-target">17:00</span> <a class="map-link editable-target spot-map-link" href="https://www.google.com/maps/search/?api=1&query=%E5%AE%9A%E5%B1%B1%E6%BA%AA%E8%B1%AA%E6%99%AF%E9%85%92%E5%BA%97" target="_blank">定山溪豪景酒店</a></div>
+                        <div class="trans-info">
+                            <b>交通路線: </b><span class="editable-target">未設定路線</span> 
+                            <span class="route-link-wrapper"></span>
+                            <button type="button" class="btn-set-route" onclick="editRouteForSpot(this)">📍 設定 Google 路線</button>
+                        </div>
                         
                     </div></div>
                     <button type="button" class="inline-add-spot-btn" onclick="addNewSpotToDay(this)">+ 新增景點時段</button>
@@ -280,27 +409,59 @@
                 <div class="sub-menu-content">
                     <div class="spots-list-wrapper">
                     <div class="item-box">
-                        <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
-                        <div class="time-spot"><span class="editable-target">12:22</span> <a class="map-link editable-target" href="https://www.google.com/maps/search/?api=1&query=%E5%AE%9A%E5%B1%B1%E6%B8%93%E6%B8%A9%E6%B3%89%E6%9D%B12%E4%B8%81%E7%9B%AE%20(%E5%AE%9A%E5%B1%B1%E6%BA%AA%E7%AB%99)" target="_blank">定山渓温泉東2丁目 (定山溪站)</a></div>
-                        <div class="trans-info"><b>交通路線: </b><span class="editable-target">定山溪回到札幌市區</span><a class="route-btn" href="https://www.google.com/maps/dir/%E5%AE%9A%E5%B1%B1%E6%BA%AA%E6%BA%AB%E6%B3%89%E6%9D%B12%E4%B8%81%E7%9B%AE/%E6%B2%B3%E7%AB%A5liner(%E8%96%84%E9%87%8E%E7%AB%99)" target="_blank">📍【google路線】</a></div>
+                        <div class="spot-order-actions">
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, -1)">⬆</button>
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, 1)">⬇</button>
+                            <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
+                        </div>
+                        <div class="time-spot"><span class="editable-target">12:22</span> <a class="map-link editable-target spot-map-link" href="https://www.google.com/maps/search/?api=1&query=%E5%AE%9A%E5%B1%B1%E6%B8%93%E6%B8%A9%E6%B3%89%E6%9D%B12%E4%B8%81%E7%9B%AE%20(%E5%AE%9A%E5%B1%B1%E6%BA%AA%E7%AB%99)" target="_blank">定山渓温泉東2丁目 (定山溪站)</a></div>
+                        <div class="trans-info">
+                            <b>交通路線: </b><span class="editable-target">定山溪回到札幌市區</span> 
+                            <span class="route-link-wrapper"><a class="route-btn" href="https://www.google.com/maps/dir/%E5%AE%9A%E5%B1%B1%E6%BA%AA%E6%BA%AB%E6%B3%89%E6%9D%B12%E4%B8%81%E7%9B%AE/%E6%B2%B3%E7%AB%A5liner(%E8%96%84%E9%87%8E%E7%AB%99)" target="_blank">📍【google路線】</a></span>
+                            <button type="button" class="btn-set-route" onclick="editRouteForSpot(this)">📍 設定 Google 路線</button>
+                        </div>
                         <div class="note-info editable-target">搭河童liner回札幌市區</div>
                     </div>
                     <div class="item-box">
-                        <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
-                        <div class="time-spot"><span class="editable-target">約1小時左右</span> <a class="map-link editable-target" href="https://www.google.com/maps/search/?api=1&query=Zabo%20Hills%20305" target="_blank">Zabo Hills 305</a></div>
-                        <div class="trans-info"><b>交通路線: </b><span class="editable-target">先去check in</span></div>
+                        <div class="spot-order-actions">
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, -1)">⬆</button>
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, 1)">⬇</button>
+                            <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
+                        </div>
+                        <div class="time-spot"><span class="editable-target">約1小時左右</span> <a class="map-link editable-target spot-map-link" href="https://www.google.com/maps/search/?api=1&query=Zabo%20Hills%20305" target="_blank">Zabo Hills 305</a></div>
+                        <div class="trans-info">
+                            <b>交通路線: </b><span class="editable-target">先去check in</span> 
+                            <span class="route-link-wrapper"></span>
+                            <button type="button" class="btn-set-route" onclick="editRouteForSpot(this)">📍 設定 Google 路線</button>
+                        </div>
                         
                     </div>
                     <div class="item-box">
-                        <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
-                        <div class="time-spot"><span class="editable-target">下午</span> <a class="map-link editable-target" href="https://www.google.com/maps/search/?api=1&query=%E7%8B%B8%E5%B0%8F%E8%B7%AF" target="_blank">狸小路</a></div>
-                        <div class="trans-info"><b>交通路線: </b><span class="editable-target">走路到狸小路逛街</span><a class="route-btn" href="https://www.google.com/maps/dir/Zabo%20Hills%20305/%E7%8B%B8%E5%B0%8F%E8%B7%AF" target="_blank">📍【google路線】</a></div>
+                        <div class="spot-order-actions">
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, -1)">⬆</button>
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, 1)">⬇</button>
+                            <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
+                        </div>
+                        <div class="time-spot"><span class="editable-target">下午</span> <a class="map-link editable-target spot-map-link" href="https://www.google.com/maps/search/?api=1&query=%E7%8B%B8%E5%B0%8F%E8%B7%AF" target="_blank">狸小路</a></div>
+                        <div class="trans-info">
+                            <b>交通路線: </b><span class="editable-target">走路到狸小路逛街</span> 
+                            <span class="route-link-wrapper"><a class="route-btn" href="https://www.google.com/maps/dir/Zabo%20Hills%20305/%E7%8B%B8%E5%B0%8F%E8%B7%AF" target="_blank">📍【google路線】</a></span>
+                            <button type="button" class="btn-set-route" onclick="editRouteForSpot(this)">📍 設定 Google 路線</button>
+                        </div>
                         
                     </div>
                     <div class="item-box">
-                        <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
-                        <div class="time-spot"><span class="editable-target">18:30</span> <a class="map-link editable-target" href="https://www.google.com/maps/search/?api=1&query=%E6%B4%BB%E4%B8%80%E9%AE%AE%20%E5%8D%973%E6%9D%A1%E5%BA%97" target="_blank">活一鮮 南3条店</a></div>
-                        
+                        <div class="spot-order-actions">
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, -1)">⬆</button>
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, 1)">⬇</button>
+                            <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
+                        </div>
+                        <div class="time-spot"><span class="editable-target">18:30</span> <a class="map-link editable-target spot-map-link" href="https://www.google.com/maps/search/?api=1&query=%E6%B4%BB%E4%B8%80%E9%AE%AE%20%E5%8D%973%E6%9D%A1%E5%BA%97" target="_blank">活一鮮 南3条店</a></div>
+                        <div class="trans-info">
+                            <b>交通路線: </b><span class="editable-target">未設定路線</span> 
+                            <span class="route-link-wrapper"></span>
+                            <button type="button" class="btn-set-route" onclick="editRouteForSpot(this)">📍 設定 Google 路線</button>
+                        </div>
                         <div class="note-info editable-target">晚餐暫定北海道道地迴轉壽司店</div>
                     </div></div>
                     <button type="button" class="inline-add-spot-btn" onclick="addNewSpotToDay(this)">+ 新增景點時段</button>
@@ -312,21 +473,45 @@
                 <div class="sub-menu-content">
                     <div class="spots-list-wrapper">
                     <div class="item-box">
-                        <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
-                        <div class="time-spot"><span class="editable-target">7:30</span> <a class="map-link editable-target" href="https://www.google.com/maps/search/?api=1&query=%E4%BA%8C%E6%A2%9D%E5%B8%82%E5%A0%B4" target="_blank">二條市場</a></div>
-                        
+                        <div class="spot-order-actions">
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, -1)">⬆</button>
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, 1)">⬇</button>
+                            <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
+                        </div>
+                        <div class="time-spot"><span class="editable-target">7:30</span> <a class="map-link editable-target spot-map-link" href="https://www.google.com/maps/search/?api=1&query=%E4%BA%8C%E6%A2%9D%E5%B8%82%E5%A0%B4" target="_blank">二條市場</a></div>
+                        <div class="trans-info">
+                            <b>交通路線: </b><span class="editable-target">未設定路線</span> 
+                            <span class="route-link-wrapper"><a class="route-btn" href="https://www.google.com/maps/dir/Zabo%20Hills%20305/%E4%BA%8C%E6%A2%9D%E5%B8%82%E5%A0%B4" target="_blank">📍【google路線】</a></span>
+                            <button type="button" class="btn-set-route" onclick="editRouteForSpot(this)">📍 設定 Google 路線</button>
+                        </div>
                         <div class="note-info editable-target">市場逛逛</div>
                     </div>
                     <div class="item-box">
-                        <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
-                        <div class="time-spot"><span class="editable-target">8:30</span> <a class="map-link editable-target" href="https://www.google.com/maps/search/?api=1&query=Donburi%20Chaya%20%20%E6%B5%B7%E9%AE%AE%E6%97%A9%E5%8D%88%E9%A4%90" target="_blank">Donburi Chaya  海鮮早午餐</a></div>
-                        <div class="trans-info"><b>交通路線: </b><span class="editable-target">二條市場-Donburi Chaya吃海鮮早午餐</span><a class="route-btn" href="https://www.google.com/maps/dir/%E4%BA%8C%E6%A2%9D%E5%B8%82%E5%A0%B4/Donburi%20Chaya" target="_blank">📍【google路線】</a></div>
+                        <div class="spot-order-actions">
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, -1)">⬆</button>
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, 1)">⬇</button>
+                            <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
+                        </div>
+                        <div class="time-spot"><span class="editable-target">8:30</span> <a class="map-link editable-target spot-map-link" href="https://www.google.com/maps/search/?api=1&query=Donburi%20Chaya%20%20%E6%B5%B7%E9%AE%AE%E6%97%A9%E5%8D%88%E9%A4%90" target="_blank">Donburi Chaya  海鮮早午餐</a></div>
+                        <div class="trans-info">
+                            <b>交通路線: </b><span class="editable-target">二條市場-Donburi Chaya吃海鮮早午餐</span> 
+                            <span class="route-link-wrapper"><a class="route-btn" href="https://www.google.com/maps/dir/%E4%BA%8C%E6%A2%9D%E5%B8%82%E5%A0%B4/Donburi%20Chaya" target="_blank">📍【google路線】</a></span>
+                            <button type="button" class="btn-set-route" onclick="editRouteForSpot(this)">📍 設定 Google 路線</button>
+                        </div>
                         
                     </div>
                     <div class="item-box">
-                        <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
-                        <div class="time-spot"><span class="editable-target">11:00</span> <a class="map-link editable-target" href="https://www.google.com/maps/search/?api=1&query=%E6%96%B0%E5%8D%83%E6%AD%B2%E6%A9%9F%E5%A0%B4" target="_blank">新千歲機場</a></div>
-                        
+                        <div class="spot-order-actions">
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, -1)">⬆</button>
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, 1)">⬇</button>
+                            <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
+                        </div>
+                        <div class="time-spot"><span class="editable-target">11:00</span> <a class="map-link editable-target spot-map-link" href="https://www.google.com/maps/search/?api=1&query=%E6%96%B0%E5%8D%83%E6%AD%B2%E6%A9%9F%E5%A0%B4" target="_blank">新千歲機場</a></div>
+                        <div class="trans-info">
+                            <b>交通路線: </b><span class="editable-target">未設定路線</span> 
+                            <span class="route-link-wrapper"><a class="route-btn" href="https://www.google.com/maps/dir/Zabo%20Hills%20305/%E6%96%B0%E5%8D%83%E6%AD%B2%E6%A9%9F%E5%A0%B4" target="_blank">📍【google路線】</a></span>
+                            <button type="button" class="btn-set-route" onclick="editRouteForSpot(this)">📍 設定 Google 路線</button>
+                        </div>
                         <div class="note-info editable-target">11:00準時出發新千歲機場行最後伴手禮採買</div>
                     </div></div>
                     <button type="button" class="inline-add-spot-btn" onclick="addNewSpotToDay(this)">+ 新增景點時段</button>
@@ -359,7 +544,8 @@
                     <summary class="sub-menu-title editable-target">唐吉軻德驚安殿堂優惠券</summary>
                     <div class="sub-menu-content">
                         <div class="card" style="background-color: #fffaf0; border-color: #f6ad55; margin-bottom: 0;">
-                            <a class="coupon-btn" href="https://japanportal.donki-global.com/coupon/?ptcd=0054000103" target="_blank">👉 點此開啟電子優惠券</a>
+                            <span class="coupon-link-wrapper"><a class="coupon-btn" href="https://japanportal.donki-global.com/coupon/?ptcd=0054000103" target="_blank">👉 點此開啟電子優惠券</a></span>
+                            <button type="button" class="btn-edit-link" onclick="editCouponUrl(this)">🔗 換連結</button>
                             <div class="editable-target" style="font-size: 13.5px; color: var(--sub-text); margin-top: 10px;">消費滿￥10,000，免稅10%再享5%折扣<br>消費滿￥30,000，免稅10%再享7%折扣</div>
                         </div>
                     </div>
@@ -369,7 +555,8 @@
                     <summary class="sub-menu-title editable-target">札幌藥妝優惠折扣券Coupon</summary>
                     <div class="sub-menu-content">
                         <div class="card" style="background-color: #fffaf0; border-color: #f6ad55; margin-bottom: 0;">
-                            <a class="coupon-btn" href="https://drive.google.com/file/d/1m6dguDtRe2PXxNqYTbtkexDqTwul1zYD/view" target="_blank">👉 點此開啟電子優惠券</a>
+                            <span class="coupon-link-wrapper"><a class="coupon-btn" href="https://drive.google.com/file/d/1m6dguDtRe2PXxNqYTbtkexDqTwul1zYD/view" target="_blank">👉 點此開啟電子優惠券</a></span>
+                            <button type="button" class="btn-edit-link" onclick="editCouponUrl(this)">🔗 換連結</button>
                             <div class="editable-target" style="font-size: 13.5px; color: var(--sub-text); margin-top: 10px;">優惠內容：達退稅門檻，退稅後再享5%折扣<br>推薦店家：北海道各地札幌藥妝皆可使用(光狸小路商店街就有5間)</div>
                         </div>
                     </div>
@@ -379,7 +566,8 @@
                     <summary class="sub-menu-title editable-target">其他優惠券</summary>
                     <div class="sub-menu-content">
                         <div class="card" style="background-color: #fffaf0; border-color: #f6ad55; margin-bottom: 0;">
-                            <a class="coupon-btn" href="https://mimigo.tw/hokkaido-coupon/" target="_blank">👉 點此開啟電子優惠券</a>
+                            <span class="coupon-link-wrapper"><a class="coupon-btn" href="https://mimigo.tw/hokkaido-coupon/" target="_blank">👉 點此開啟電子優惠券</a></span>
+                            <button type="button" class="btn-edit-link" onclick="editCouponUrl(this)">🔗 換連結</button>
                             
                         </div>
                     </div>
@@ -394,25 +582,27 @@
                 <div id="docsWrapper">
                 <div class="card" style="margin-bottom: 10px;">
                     <button type="button" class="del-item-btn" onclick="this.closest('.card').remove()">✕</button>
-                    <div class="editable-target" style="font-size: 15.5px; font-weight: bold; color: var(--primary);">河童liner</div>
-                    <div class="editable-target" style="font-size: 13.5px; color: var(--sub-text); margin-top: 4px;">4</div>
-                    
-                <div style="margin-top: 8px;">
-                    <a href="https://drive.google.com/drive/folders/1K9WJh0YXtcu4cbk6uSEK-77xKiyjjGaZ?usp=sharing" target="_blank" class="doc-link-btn">
-                        🔗 查看票券 / 圖檔連結
-                    </a>
-                </div>
-                </div>
-                <div class="card" style="margin-bottom: 10px;">
-                    <button type="button" class="del-item-btn" onclick="this.closest('.card').remove()">✕</button>
                     <div class="editable-target" style="font-size: 15.5px; font-weight: bold; color: var(--primary);">JR 列車</div>
                     <div class="editable-target" style="font-size: 13.5px; color: var(--sub-text); margin-top: 4px;">10/12從札幌到新千歲機場票券 所有家人都是「4號車 」  8番C席 8番D席 9番B席 9番C席 9番D席</div>
-                    
+                    <div class="doc-link-wrapper">
                 <div style="margin-top: 8px;">
                     <a href="https://drive.google.com/file/d/1EFIhXQFV1SrvGoJEPfFlensBtMRatJWP/view?usp=drive_link" target="_blank" class="doc-link-btn">
                         🔗 查看票券 / 圖檔連結
                     </a>
+                </div></div>
+                    <button type="button" class="btn-edit-link" style="margin-top: 6px;" onclick="editDocLinkUrl(this)">🔗 換連結</button>
                 </div>
+                <div class="card" style="margin-bottom: 10px;">
+                    <button type="button" class="del-item-btn" onclick="this.closest('.card').remove()">✕</button>
+                    <div class="editable-target" style="font-size: 15.5px; font-weight: bold; color: var(--primary);">河童liner</div>
+                    <div class="editable-target" style="font-size: 13.5px; color: var(--sub-text); margin-top: 4px;"></div>
+                    <div class="doc-link-wrapper">
+                <div style="margin-top: 8px;">
+                    <a href="https://drive.google.com/drive/folders/1K9WJh0YXtcu4cbk6uSEK-77xKiyjjGaZ?usp=sharing" target="_blank" class="doc-link-btn">
+                        🔗 查看票券 / 圖檔連結
+                    </a>
+                </div></div>
+                    <button type="button" class="btn-edit-link" style="margin-top: 6px;" onclick="editDocLinkUrl(this)">🔗 換連結</button>
                 </div></div>
                 <button type="button" class="inline-add-section-btn" onclick="addNewDocItem()">➕ 新增重要文件 / 票券</button>
             </div>
@@ -420,18 +610,117 @@
     </div>
 
     <script>
+    // 景點時段上移 / 下移排序
+    function moveSpotItem(btn, direction) {
+        const item = btn.closest('.item-box');
+        if (!item) return;
+        if (direction === -1) {
+            const prev = item.previousElementSibling;
+            if (prev && prev.classList.contains('item-box')) {
+                item.parentNode.insertBefore(item, prev);
+            }
+        } else if (direction === 1) {
+            const next = item.nextElementSibling;
+            if (next && next.classList.contains('item-box')) {
+                item.parentNode.insertBefore(next, item);
+            }
+        }
+    }
+
+    // 監聽景點文字修改：失焦自動更新 Google Maps 超連結
+    document.addEventListener('focusout', function(e) {
+        if (e.target && e.target.classList.contains('spot-map-link')) {
+            const newText = e.target.textContent.trim();
+            if (newText) {
+                e.target.href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(newText);
+            }
+        }
+    });
+
+    // 手動設定 / 修改 Google 路線功能
+    function editRouteForSpot(btn) {
+        const transBox = btn.closest('.trans-info');
+        const wrapper = transBox.querySelector('.route-link-wrapper');
+        const currentLink = wrapper.querySelector('a.route-btn');
+        const defaultVal = currentLink ? currentLink.href : '';
+
+        const inputVal = prompt("請輸入 Google 路線網址，或輸入「起點 / 終點」自動生成：\n(例如：札幌車站 / 小樽運河，若欲刪除請清空留白)", defaultVal);
+        if (inputVal === null) return;
+
+        const val = inputVal.trim();
+        if (!val) {
+            wrapper.innerHTML = '';
+        } else if (val.startsWith('http://') || val.startsWith('https://')) {
+            wrapper.innerHTML = '<a class="route-btn" href="' + val + '" target="_blank">📍【google路線】</a>';
+        } else if (val.includes('/') || val.includes('➔') || val.includes('到') || val.includes('-')) {
+            const parts = val.split(/[\/➔到\-]/).map(s => s.trim()).filter(Boolean);
+            if (parts.length >= 2) {
+                const autoUrl = 'https://www.google.com/maps/dir/' + encodeURIComponent(parts[0]) + '/' + encodeURIComponent(parts[1]);
+                wrapper.innerHTML = '<a class="route-btn" href="' + autoUrl + '" target="_blank">📍【google路線】</a>';
+            } else {
+                const searchUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(val);
+                wrapper.innerHTML = '<a class="route-btn" href="' + searchUrl + '" target="_blank">📍【google路線】</a>';
+            }
+        } else {
+            const searchUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(val);
+            wrapper.innerHTML = '<a class="route-btn" href="' + searchUrl + '" target="_blank">📍【google路線】</a>';
+        }
+    }
+
+    // 編輯電子優惠券連結網址
+    function editCouponUrl(btn) {
+        const card = btn.closest('.card');
+        const wrapper = card.querySelector('.coupon-link-wrapper');
+        const currentLink = wrapper.querySelector('a.coupon-btn');
+        const defaultVal = currentLink ? currentLink.href : '';
+
+        const inputVal = prompt("請輸入新的優惠券網址 (若欲移除請留白清空)：", defaultVal);
+        if (inputVal === null) return;
+
+        const val = inputVal.trim();
+        if (!val) {
+            wrapper.innerHTML = '';
+        } else {
+            wrapper.innerHTML = '<a class="coupon-btn" href="' + val + '" target="_blank">👉 點此開啟電子優惠券</a>';
+        }
+    }
+
+    // 編輯重要文件 / 票券圖檔連結網址
+    function editDocLinkUrl(btn) {
+        const card = btn.closest('.card');
+        const wrapper = card.querySelector('.doc-link-wrapper');
+        const currentLink = wrapper.querySelector('a.doc-link-btn');
+        const defaultVal = currentLink ? currentLink.href : '';
+
+        const inputVal = prompt("請輸入新的票券 / 圖檔連結網址 (若欲移除請留白清空)：", defaultVal);
+        if (inputVal === null) return;
+
+        const val = inputVal.trim();
+        if (!val) {
+            wrapper.innerHTML = '';
+        } else {
+            wrapper.innerHTML = '<div style="margin-top: 8px;"><a href="' + val + '" target="_blank" class="doc-link-btn">🔗 查看票券 / 圖檔連結</a></div>';
+        }
+    }
+
     function addNewSpotToDay(btn) {
         const wrapper = btn.previousElementSibling;
         const newBox = document.createElement('div');
         newBox.className = 'item-box';
         newBox.innerHTML = `
-            <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
+            <div class="spot-order-actions">
+                <button type="button" class="btn-order" onclick="moveSpotItem(this, -1)">⬆</button>
+                <button type="button" class="btn-order" onclick="moveSpotItem(this, 1)">⬇</button>
+                <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
+            </div>
             <div class="time-spot">
                 <span class="editable-target" contenteditable="true">12:00 - 13:30</span> 
-                <a class="map-link editable-target" contenteditable="true" href="https://www.google.com/maps" target="_blank">新增景點名稱</a>
+                <a class="map-link editable-target spot-map-link" contenteditable="true" href="https://www.google.com/maps/search/?api=1&query=%E6%96%B0%E6%99%AF%E9%BB%9E" target="_blank">新增景點名稱</a>
             </div>
             <div class="trans-info">
                 <b>交通路線: </b><span class="editable-target" contenteditable="true">路線資訊說明</span>
+                <span class="route-link-wrapper"></span>
+                <button type="button" class="btn-set-route" onclick="editRouteForSpot(this)">📍 設定 Google 路線</button>
             </div>
             <div class="note-info editable-target" contenteditable="true">備註事項說明</div>
         `;
@@ -449,13 +738,19 @@
             <div class="sub-menu-content">
                 <div class="spots-list-wrapper">
                     <div class="item-box">
-                        <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
+                        <div class="spot-order-actions">
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, -1)">⬆</button>
+                            <button type="button" class="btn-order" onclick="moveSpotItem(this, 1)">⬇</button>
+                            <button type="button" class="del-item-btn" onclick="this.closest('.item-box').remove()">✕</button>
+                        </div>
                         <div class="time-spot">
                             <span class="editable-target" contenteditable="true">09:00</span> 
-                            <a class="map-link editable-target" contenteditable="true" href="https://www.google.com/maps" target="_blank">新景點名稱</a>
+                            <a class="map-link editable-target spot-map-link" contenteditable="true" href="https://www.google.com/maps/search/?api=1&query=%E6%96%B0%E6%99%AF%E9%BB%9E" target="_blank">新景點名稱</a>
                         </div>
                         <div class="trans-info">
                             <b>交通路線: </b><span class="editable-target" contenteditable="true">交通規劃</span>
+                            <span class="route-link-wrapper"></span>
+                            <button type="button" class="btn-set-route" onclick="editRouteForSpot(this)">📍 設定 Google 路線</button>
                         </div>
                         <div class="note-info editable-target" contenteditable="true">注意事項</div>
                     </div>
@@ -486,7 +781,8 @@
             <summary class="sub-menu-title editable-target" contenteditable="true">新店家優惠券名稱</summary>
             <div class="sub-menu-content">
                 <div class="card" style="background-color: #fffaf0; border-color: #f6ad55; margin-bottom: 0;">
-                    <a class="coupon-btn editable-target" contenteditable="true" href="https://" target="_blank">👉 點此開啟電子優惠券</a>
+                    <span class="coupon-link-wrapper"><a class="coupon-btn" href="https://" target="_blank">👉 點此開啟電子優惠券</a></span>
+                    <button type="button" class="btn-edit-link" onclick="editCouponUrl(this)">🔗 換連結</button>
                     <div class="editable-target" contenteditable="true" style="font-size: 13.5px; color: var(--sub-text); margin-top: 10px;">請在此點擊輸入折扣說明</div>
                 </div>
             </div>
@@ -503,11 +799,14 @@
             <button type="button" class="del-item-btn" onclick="this.closest('.card').remove()">✕</button>
             <div class="editable-target" contenteditable="true" style="font-size: 15.5px; font-weight: bold; color: var(--primary);">新文件 / 票券名稱</div>
             <div class="editable-target" contenteditable="true" style="font-size: 13.5px; color: var(--sub-text); margin-top: 4px;">備註說明</div>
-            <div style="margin-top: 8px;">
-                <a href="https://" target="_blank" class="doc-link-btn editable-target" contenteditable="true">
-                    🔗 查看票券 / 圖檔連結
-                </a>
+            <div class="doc-link-wrapper">
+                <div style="margin-top: 8px;">
+                    <a href="https://" target="_blank" class="doc-link-btn">
+                        🔗 查看票券 / 圖檔連結
+                    </a>
+                </div>
             </div>
+            <button type="button" class="btn-edit-link" style="margin-top: 6px;" onclick="editDocLinkUrl(this)">🔗 換連結</button>
         `;
         wrapper.appendChild(newDoc);
     }
@@ -515,7 +814,7 @@
     (function() {
         const FIREBASE_DB_URL = "https://wanghomesapporotravel2026-default-rtdb.firebaseio.com/";
         const FIREBASE_ROOM_ID = "wang-family-hokkaido";
-        const LOCAL_BUILD_TIME = "2026-10-04T17:39:01.928Z";
+        const LOCAL_BUILD_TIME = "2026-10-05T03:50:26.698Z";
         const STORAGE_KEY = 'saved_guide_html_' + location.pathname;
         let isEditing = false;
 
@@ -551,8 +850,6 @@
                 fetch(endpoint)
                     .then(res => res.json())
                     .then(data => {
-                        // 核心防護：時間戳記比對
-                        // 只有當雲端的更新時間確實「比本次下載的時間更晚」時，才允許雲端覆蓋本地！
                         const cloudTime = data && data.updatedAt ? new Date(data.updatedAt).getTime() : 0;
                         const localTime = new Date(LOCAL_BUILD_TIME).getTime();
 
@@ -561,7 +858,6 @@
                             text.textContent = '已同步最新雲端手冊';
                             dot.style.background = '#48bb78';
                         } else {
-                            // 本地檔案比雲端還要新！立即自動將本地最新版回寫更新至雲端
                             text.textContent = '本地版本較新，已自動更新至雲端';
                             dot.style.background = '#48bb78';
                             const mainHtml = document.getElementById('guideMainContent').innerHTML;
